@@ -352,7 +352,7 @@ async def delrep(client, message):
             msg = "Here is the list of replacements you have added : \n"
             index = 1
             for replacement in replacements:
-                msg += f"{index}. {replacement[0]} ➡️ {replacement[1]} \n"
+                msg += f"{index}. {replacement[0]} ➡️ {replacement[1]} \n\n"
                 index += 1
             await message.reply(msg)
             await app.send_message(chat_id, "Please send the indexes of the replacements you want to delete separated by a space. \nExample : `1 2 3`")
@@ -398,7 +398,7 @@ async def listreps(client, message):
         if replacements:
             msg = "Here is the list of replacements you have added : \n\n"
             for replacement in replacements:
-                msg += f"🟢 {replacement[0]} ➡️ {replacement[1]} \n"
+                msg += f"🟢 {replacement[0]} ➡️ {replacement[1]} \n\n"
             msg += "`/delrep` - Delete a replacement from the list of replacements.\n"
             print(msg)
             await message.reply(msg, parse_mode=enums.ParseMode.HTML)
