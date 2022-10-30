@@ -9,7 +9,6 @@ from api import add_channel,\
 import re
 from convopyro import Conversation
 from convopyro import listen_message
-import pickle
 
 
 api_id = 20369082
@@ -317,7 +316,6 @@ async def addrep(client, message):
             return
 
         word = str(answer.text)
-        pickle.dump(word, open("word", "wb"))
         if "|" in word:
             wordList = word.split("|")
         elif ":" in word:

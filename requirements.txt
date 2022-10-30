@@ -1,5 +1,6 @@
-psycopg2==2.9.3
+convopyro @ git+https://github.com/Ripeey/Conversation-Pyrogram@a39cc9e0c1a689c9904dd5be5419246868daecfb
+psycopg2==2.9.5
 pyaes==1.6.1
-pyasn1==0.4.8
-rsa==4.9
-Telethon==1.25.0
+Pyrogram==2.0.59
+PySocks==1.7.1
+TgCrypto==1.2.4
