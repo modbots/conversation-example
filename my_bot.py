@@ -308,7 +308,7 @@ async def addrep(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
 
-        await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \nExample : `word|replacement` or `word:replacement` or `word=replacement`")
+        await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : '😲'=<emoji id='5381855971943389791'>🔥</emoji>",parse_mode=enums.ParseMode.HTML)
         answer = await listen_message(client, chat_id, timeout=None)
 
         if answer.text == "/cancel":
