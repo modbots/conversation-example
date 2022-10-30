@@ -1,31 +1,30 @@
-import os
+from pyrogram import Client, filters, enums
+from api import add_channel,\
+    delete_channel, get_channels, \
+    delete_all_channels, add_word, \
+    delete_word, get_words, \
+    delete_all_words, get_replace,\
+    add_replace, delete_replace, get_replacements
+
 import re
-from telethon import TelegramClient, events, Button
-from telethon.tl.functions.users import GetFullUserRequest
-from telethon.tl.functions.channels import JoinChannelRequest, LeaveChannelRequest
-from api import add_channel, delete_channel, get_channels, delete_all_channels, add_word, delete_word, get_words, delete_all_words, get_replace, add_replace
-from telethon.tl.types import MessageEntityMentionName
+from convopyro import Conversation
+from convopyro import listen_message
+import pickle
+
+
+api_id = 20369082
+api_hash = "070411cae8f4510368f4c94f82903b1a"
+
+# app = Client("my_account", api_id=api_id, api_hash=api_hash)
+# app.run()
 
 print("Starting deployment...")
-try:
-    api_id = int(os.environ["API_ID"])
-    api_hash = os.environ["API_HASH"]
-    bot_token = os.environ["BOT_TOKEN"]
-    from_channel = int(os.environ["FROM_CHANNEL"])
-    to_channel = int(os.environ["TO_CHANNEL"])
-
-except:
-    api_id = "20369082"
-    api_hash = "070411cae8f4510368f4c94f82903b1a"
-    from_channel = int(-1001710050962)
-    to_channel = int(-1001460238566)
-
-
-
-bot = TelegramClient('botop', api_id, api_hash).start()
+app = Client("my_account")
+Conversation(app)
 
 wordBlacklist = get_words()
 wordReplace = get_replace()
+channelList = get_channels()
 emoj = re.compile("["
                   u"\U0001F600-\U0001F64F"  # emoticons
                   u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -46,6 +45,7 @@ emoj = re.compile("["
                   u"\ufe0f"  # dingbats
                   u"\u3030"
                   "]+", re.UNICODE)
+to_channel_id = -1001834671869
 
 
 def is_english(text):
@@ -62,216 +62,187 @@ def is_english(text):
 
 def is_in_blacklist(text):
     # check words
-    if words:
-        for word in words:
+    if wordBlacklist:
+        for word in wordBlacklist:
             if word[0] in text:
                 return True
     return False
 
 
-@bot.on(events.NewMessage(pattern="^/start$|hi|hello|hey|HI|HELLO|HEY", func=lambda e: e.is_private))
-async def _(event):
-    # ok = await bot(GetFullUserRequest(event.sender_id))
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
-        # say hi vith name
-        sender = await event.get_sender()
-        await bot.send_file(sender, 'AnimatedSticker.tgs')
-        await event.reply("Hi ," + sender.username + " 👋 !")
-        await bot.send_message(sender, "use `/help` to see all commands")
+def get_html_emoj(emoji_id):
+    return
+
+
+@app.on_message(filters.command(["help"]))
+async def help(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the .😊 \n\n" +
+                                 "**Commands**\n\n" +
+                                 "🪛`/add` - Add a channel to the list of channels to be forwarded.\n" +
+                                 "🪛`/delete` - Delete a channel from the list of channels to be forwarded.\n" +
+                                 "🪛`/list` - List all channels that are being forwarded.\n`/addword` - Add a word to the blacklist.\n" +
+                                 "🪛`/delword` - Delete a word from the blacklist.\n🪛`/listwords` - List all words in the blacklist.\n" +
+                                 "🪛`/deleteallword` - Delete all words from the blacklist.\n" +
+                                 "🪛`/deleteall` - Delete all channels from the list of channels to be forwarded.\n\n" +
+                                 "🪛`/addrep` - Add a word to the replace list.\n" +
+                                 "🪛`/delreps` - Delete a word from the replace list.\n" +
+                                 "🪛`/listreps` - List all words in the replace list.\n" +
+                                 "**Note**\n\n🔸This bot will only forward posts from channels that are in English.\n" +
+                                 "🔸This bot will not forward posts that contain words in the blacklist." +
+                                 "\n\n**Support**\n\n🔹If you have any questions, please contact @CMNisal")
+
+
+@app.on_message(filters.command(["add"]))
+async def add(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        # start a conversation
+        await client.send_message(chat_id, "Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
+        answer = await listen_message(client, chat_id, timeout=None)
+        if answer.text == "/cancel":
+            await client.listen.Cancel(filters.user(chat_id))
+            await app.send_message(chat_id, "Cancelled❎")
+            return
+
+        if answer.forward_from_chat:
+            channel_id = answer.forward_from_chat.id
+        else:
+            channel_id = answer.text
+        channel_name = answer.forward_from_chat.username
+        # try to join channel
+        try:
+            await app.join_chat(channel_id)
+        except:
+            await app.send_message(chat_id, "I can't join that channel,  Manually join and")
+            await add(client, message)
+            return
+        # ask with button to select all or media  or text
+        await app.send_message(chat_id, "Please send letter of the Message Filter you want to add \nA- All\nMT- Media with Text\nM- Media Only\nT- Text Only")
+
+        answer = await listen_message(client, chat_id, timeout=None)
+        if answer.text == "/cancel":
+            await client.listen.Cancel(filters.user(chat_id))
+            await app.send_message(chat_id, "Cancelled❎")
+            return
+
+        if answer.text.lower() == "a":
+            channel_type = "all"
+        elif answer.text.lower() == "mt":
+            channel_type = "media_text"
+        elif answer.text.lower() == "m":
+            channel_type = "media"
+        elif answer.text.lower() == "t":
+            channel_type = "text"
+
+        await app.send_message(chat_id, "Please send the footer you want to add to the posts")
+        answer = await listen_message(client, chat_id, timeout=None)
+        if answer.text == "/cancel":
+            await client.listen.Cancel(filters.user(chat_id))
+            await app.send_message(chat_id, "Cancelled❎")
+            return
+        channel_footer = answer.text
+        add_channel(str(channel_id), channel_type,
+                    channel_footer, channel_name)
+        await app.send_message(chat_id, "✅Channel added successfully  \nuse  `/list` to see the list of channels")
+        channelList = get_channels()
         return
-    await event.reply(f"Hi ! I am a bot of Mr. Nisal Chandrasekara,\n please contact @CMNisal to get access to this bot")
+        # await message.reply_text("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
+
+# list
 
 
-@bot.on(events.NewMessage(pattern="^/help$", func=lambda e: e.is_private))
-async def help(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
-        await event.reply("**Help menu**\n\n😎This bot will send all new posts in one channel to the .😊 \n\n**Commands**\n\n🪛`/add` - Add a channel to the list of channels to be forwarded.\n🪛`/delete` - Delete a channel from the list of channels to be forwarded.\n🪛`/list` - List all channels that are being forwarded.\n`/addword` - Add a word to the blacklist.\n🪛`/delword` - Delete a word from the blacklist.\n🪛`/listwords` - List all words in the blacklist.\n🪛`/deleteallword` - Delete all words from the blacklist.\n🪛`/deleteall` - Delete all channels from the list of channels to be forwarded.\n\n**Note**\n\n🔸This bot will only forward posts from channels that are in English.\n🔸This bot will not forward posts that contain words in the blacklist.\n\n**Support**\n\n🔹If you have any questions, please contact @Leoglarrix")
+@app.on_message(filters.command(["list"]))
+async def list(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
 
-# use exactly this name /add
-
-
-@bot.on(events.NewMessage(pattern="^/add$"))
-async def add(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
-
-        sender = await event.get_sender()
-        SENDER = sender.id
-
-        # Start a conversation and /cancel it
-        async with bot.conversation(await event.get_chat(), exclusive=True) as conv:
-            # ask for channel id
-            await conv.send_message("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
-            response = await conv.get_response()
-            if response.text == "/cancel":
-                await conv.send_message("Cancelled❎")
-                return
-
-            try:
-                channel_id = int(response.text)
-            except:
-                channel_id = - \
-                    (response.fwd_from.from_id.channel_id+1000000000000)
-
-            if channel_id == to_channel:
-                await conv.send_message("You can't add this channel.")
-                return
-
-            # try to join channel
-            try:
-                await bot(JoinChannelRequest(channel_id))
-            except:
-                # join to channel by invite link
-                await conv.send_message("Please send the **invite link**🔗 of the channel you want to add.")
-                response = await conv.get_response()
-                if response.text == "/cancel":
-                    await conv.send_message("Cancelled❎")
-                    return
-                await conv.send_message("I can't join that channel,  Manually join and")
-                await add(event)
-                return
-
-            # ask with button to select all or media  or text
-            await conv.send_message("Please send letter of the Message Filter you want to add \nA- All\nMT- Media with Text\nM- Media Only\nT- Text Only")
-            response = await conv.get_response()
-            if response.text == "/cancel":
-                # leave channel
-                await bot(LeaveChannelRequest(channel_id))
-                await conv.send_message("Cancelled❎")
-                return
-            if response.text.lower() == "a":
-                channel_type = "all"
-            elif response.text.lower() == "mt":
-                channel_type = "media_text"
-            elif response.text.lower() == "m":
-                channel_type = "media"
-            elif response.text.lower() == "t":
-                channel_type = "text"
-
-            await conv.send_message("Please send the footer you want to add to the posts")
-            response = await conv.get_response()
-            if response.text == "/cancel":
-                # leave channel
-                await bot(LeaveChannelRequest(channel_id))
-                await conv.send_message("Cancelled❎")
-                return
-            footer = response.text
-
-            # join channel
-            try:
-                # join channel and get channel id
-                add_channel(str(channel_id), channel_type, footer)
-                await conv.send_message("✅Channel added successfully  \nuse  `/list` to see the list of channels")
-            except:
-                await conv.send_message("I can't join that channel,  Manually join and try to add again")
-                await add(event)
-                return
-
-
-@bot.on(events.NewMessage(pattern="^/list$"))
-async def list_channels(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
-
-        sender = await event.get_sender()
-        SENDER = sender.id
         channels = get_channels()
-        channels_list = {}
-        async for d in bot.iter_dialogs():
-            if d.is_channel:
-                channels_list[-(d.entity.id+1000000000000)] = d.name
         if channels:
             msg = "Here is the list of channels you have added : \n\n"
             for channel in channels:
-                msg += f"🟢 Channel Name : {channels_list[int(channel[0])]} \nChannel ID : {channel[0]} \nMessage Filter : {channel[1]} \nFooter : {channel[2]} \n\n"
+                msg += f"🟢 Channel Name : {channel[3]} \nChannel ID : {channel[0]} \nMessage Filter : {channel[1]} \nFooter : {channel[2]} \n\n"
 
             msg += "`/delete` - Delete a channel from the list of channels to be forwarded.\n"
-            await event.reply(msg)
+            await message.reply(msg)
         else:
-            await event.reply("You haven't added any channel yet ❗️")
+            await message.reply("You haven't added any channel yet ❗️")
 
 
-@bot.on(events.NewMessage(pattern="^/delete$"))
-async def delete(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
+@app.on_message(filters.command(["delete"]))
+async def delete(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
 
-        sender = await event.get_sender()
-        SENDER = sender.id
         channels = get_channels()
-        channels_list = {}
-        async for d in bot.iter_dialogs():
-            if d.is_channel:
-                channels_list[-(d.entity.id+1000000000000)] = d.name
         if channels:
             msg = "Here is the list of channels you have added : \n"
             index = 1
             for channel in channels:
-                msg += f"{index}. Channel Name : {channels_list[int(channel[0])]} \nChannel id : {channel[0]} \nChannel type : {channel[1]} \nFooter : {channel[2]} \n\n"
+                msg += f"{index}. Channel Name : {channel[3]} \nChannel id : {channel[0]} \nChannel type : {channel[1]} \nFooter : {channel[2]} \n\n"
                 index += 1
-            await event.reply(msg)
-            async with bot.conversation(await event.get_chat(), exclusive=True) as conv:
-                await conv.send_message("Please send the indexes of the channels you want to delete separated by a space. \nExample : `1 2 3`")
-                response = await conv.get_response()
-                if response.text == "/cancel":
-                    await conv.send_message("Cancelled❎")
-                    return
-                index = response.text
-                indexes = index.split(" ")
+            await message.reply(msg)
+            await app.send_message(chat_id, "Please send the indexes of the channels you want to delete separated by a space. \nExample : `1 2 3`")
+            answer = await listen_message(client, chat_id, timeout=None)
+            if answer.text == "/cancel":
+                await app.send_message(chat_id, "Cancelled❎")
+                return
+            index = answer.text
+            indexes = index.split(" ")
 
-                # if indexes are not numbers
-                for i in indexes:
-                    if not i.isdigit():
-                        await conv.send_message("Please send only numbers separated by a space.")
-                        return
-
-                # if indexes are valid
-                if not all(int(i) <= len(channels) for i in indexes):
-                    await conv.send_message("Invalid indexes ❗️")
+            # if indexes are not numbers
+            for i in indexes:
+                if not i.isdigit():
+                    await app.send_message(chat_id, "Please send only numbers separated by a space.")
                     return
 
-                for index in indexes:
-
-                    index = int(index)
-                    if index > len(channels):
-                        await conv.send_message("Invalid index : "+index)
-                    else:
-                        channel_id = channels[index-1][0]
-                        delete_channel(str(channel_id))
-                        # leave channel
-                        await bot(LeaveChannelRequest(int(channel_id)))
-                        await conv.send_message("✅Channel "+channel_id+" deleted successfully")
+            # if indexes are valid
+            if not all(int(i) <= len(channels) for i in indexes):
+                await app.send_message(chat_id, "Invalid indexes ❗️")
                 return
 
+            for index in indexes:
+
+                index = int(index)
+                if index > len(channels):
+                    await app.send_message(chat_id, "Invalid index : "+index)
+                else:
+                    channel_id = channels[index-1][0]
+                    delete_channel(str(channel_id))
+                    # leave channel
+                    await app.leave_chat(channel_id, delete=True)
+                    await app.send_message(chat_id, "✅Channel "+channel_id+" deleted successfully")
+                    channelList = get_channels()
+            return
+
         else:
-            await event.reply("You haven't added any channel yet !")
+            await message.reply("You haven't added any channel yet !")
 
 # add word to blacklist
 
 
-@bot.on(events.NewMessage(pattern="^/addword$"))
-async def addword(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
+@app.on_message(filters.command(["addword"]))
+async def addword(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        await app.send_message(chat_id, "Please send the word you want to add to the blacklist")
+        answer = await listen_message(client, chat_id, timeout=None)
+        if answer.text == "/cancel":
+            await app.send_message(chat_id, "Cancelled❎")
+            return
+        word = answer.text
+        add_word(word)
+        await app.send_message(chat_id, "✅Word added successfully")
+        words = get_words()
 
-        sender = await event.get_sender()
-        SENDER = sender.id
-        async with bot.conversation(await event.get_chat(), exclusive=True) as conv:
-            await conv.send_message("Please send the word you want to add to the blacklist")
-            response = await conv.get_response()
-            if response.text == "/cancel":
-                await conv.send_message("Cancelled❎")
-                return
-            word = response.text
-            add_word(word)
-            await conv.send_message("✅Word added successfully")
-            words = get_words()
-
-# delete word from blacklist
+# delete words from blacklist
 
 
-@bot.on(events.NewMessage(pattern="^/delword$"))
-async def delword(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
+@app.on_message(filters.command(["delword"]))
+async def delword(client, message):
 
-        sender = await event.get_sender()
-        SENDER = sender.id
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
         words = get_words()
         if words:
             msg = "Here is the list of words you have added : \n"
@@ -279,247 +250,246 @@ async def delword(event):
             for word in words:
                 msg += f"{index}. {word[0]} \n"
                 index += 1
-            await event.reply(msg)
-            async with bot.conversation(await event.get_chat(), exclusive=True) as conv:
-                await conv.send_message("Please send the indexes of the words you want to delete separated by a space. \nExample : `1 2 3`")
-                response = await conv.get_response()
-                if response.text == "/cancel":
-                    await conv.send_message("Cancelled❎")
-                    return
-                index = response.text
-                indexes = index.split(" ")
+            await message.reply(msg)
+            await app.send_message(chat_id, "Please send the indexes of the words you want to delete separated by a space. \nExample : `1 2 3`")
+            answer = await listen_message(client, chat_id, timeout=None)
+            if answer.text == "/cancel":
+                await app.send_message(chat_id, "Cancelled❎")
+                return
+            index = answer.text
+            indexes = index.split(" ")
 
-                # if indexes are not numbers
-                for i in indexes:
-                    if not i.isdigit():
-                        await conv.send_message("Please send only numbers separated by a space.")
-                        return
-
-                # if indexes are valid
-                if not all(int(i) <= len(words) for i in indexes):
-                    await conv.send_message("Invalid indexes ❗️")
+            # if indexes are not numbers
+            for i in indexes:
+                if not i.isdigit():
+                    await app.send_message(chat_id, "Please send only numbers separated by a space.")
                     return
 
-                for index in indexes:
-
-                    index = int(index)
-                    if index > len(words):
-                        await conv.send_message("Invalid index : "+index)
-                    else:
-                        word = words[index-1][0]
-                        delete_word(word)
-                        await conv.send_message("✅Word "+word+" deleted successfully")
-                        words = get_words()
+            # if indexes are valid
+            if not all(int(i) <= len(words) for i in indexes):
+                await app.send_message(chat_id, "Invalid indexes ❗️")
                 return
 
+            for index in indexes:
+                index = int(index)
+                if index > len(words):
+                    await capp.send_message(chat_id, "Invalid index : "+index)
+                else:
+                    word = words[index-1][0]
+                    delete_word(word)
+                    await app.send_message(chat_id, "✅Word "+word+" deleted successfully")
+                    words = get_words()
+            return
+
         else:
-            await event.reply("You haven't added any word yet !")
+            await message.reply("You haven't added any word yet !")
 
 # list words
 
 
-@bot.on(events.NewMessage(pattern="^/listwords$"))
-async def listwords(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
-
-        sender = await event.get_sender()
-        SENDER = sender.id
+@app.on_message(filters.command(["listwords"]))
+async def listwords(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
         words = get_words()
         if words:
             msg = "Here is the list of words you have added : \n\n"
             for word in words:
-                msg += f"🟢 {word[0]} \n"
-
+                msg += f"🟢   {word[0]} \n"
             msg += "`/delword` - Delete a word from the list of words to be filtered.\n"
-            await event.reply(msg)
+            await message.reply(msg)
         else:
-            await event.reply("You haven't added any word yet ❗️")
+            await message.reply("You haven't added any word yet ❗️")
 
 # add replacement
 
 
-@bot.on(events.NewMessage(pattern="^/addrep$"))
-async def addrep(event):
-    if event.chat_id == 1076120105 or event.chat_id == 747953161:
+@app.on_message(filters.command(["addrep"]))
+async def addrep(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
 
-        sender = await event.get_sender()
-        SENDER = sender.id
-        async with bot.conversation(await event.get_chat(), exclusive=True) as conv:
-            await conv.send_message("Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \nExample : `word|replacement` or `word:replacement` or `word=replacement`")
-            response = await conv.get_response()
-            if response.text == "/cancel":
-                await conv.send_message("Cancelled❎")
+        await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \nExample : `word|replacement` or `word:replacement` or `word=replacement`")
+        answer = await listen_message(client, chat_id, timeout=None)
+
+        if answer.text == "/cancel":
+            await app.send_message(chat_id, "Cancelled❎")
+            return
+
+        word = str(answer.text)
+        pickle.dump(word, open("word", "wb"))
+        if "|" in word:
+            wordList = word.split("|")
+        elif ":" in word:
+            wordList = word.split(":")
+        elif "=" in word:
+            wordList = word.split("=")
+        else:
+            await app.send_message(chat_id, "Invalid format ❗️")
+            return
+        if len(wordList) != 2:
+            await app.send_message(chat_id, "Invalid format ❗️")
+            return
+        # replace emojis in text with custom emoji id in message.entities
+        #"Lalaalla <emoji id=\""+str(ent.custom_emoji_id)+"\">🔥</emoji>"
+        if answer.entities:
+            for entity in answer.entities:
+                if entity.custom_emoji_id:
+                    wordList[1] = wordList[1].replace(
+                        word[entity.offset-1], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+        print(wordList)
+
+        add_replace(wordList[0], wordList[1])
+        await app.send_message(chat_id, "✅Replacement added successfully")
+
+# delete replacement
+
+
+@app.on_message(filters.command(["delreps"]))
+async def delrep(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        replacements = get_replace()
+        if replacements:
+            msg = "Here is the list of replacements you have added : \n"
+            index = 1
+            for replacement in replacements:
+                msg += f"{index}. {replacement[0]} ➡️ {replacement[1]} \n"
+                index += 1
+            await message.reply(msg)
+            await app.send_message(chat_id, "Please send the indexes of the replacements you want to delete separated by a space. \nExample : `1 2 3`")
+            answer = await listen_message(client, chat_id, timeout=None)
+            if answer.text == "/cancel":
+                await app.send_message(chat_id, "Cancelled❎")
                 return
-            word = response.text
-            if "|" in word:
-                word = word.split("|")
-            elif ":" in word:
-                word = word.split(":")
-            elif "=" in word:
-                word = word.split("=")
-            else:
-                await conv.send_message("Invalid format ❗️")
+            index = answer.text
+            indexes = index.split(" ")
+
+            # if indexes are not numbers
+            for i in indexes:
+                if not i.isdigit():
+                    await app.send_message(chat_id, "Please send only numbers separated by a space.")
+                    return
+
+            # if indexes are valid
+            if not all(int(i) <= len(replacements) for i in indexes):
+                await app.send_message(chat_id, "Invalid indexes ❗️")
                 return
-            if len(word) != 2:
-                await conv.send_message("Invalid format ❗️")
-                return
-            add_replacement(word[0], word[1])
-            await conv.send_message("✅Replacement added successfully")
+
+            for index in indexes:
+                index = int(index)
+                if index > len(replacements):
+                    await app.send_message(chat_id, "Invalid index : "+index)
+                else:
+                    replacement = replacements[index-1][0]
+                    delete_replace(replacement)
+                    await app.send_message(chat_id, "✅Replacement "+replacement+" deleted successfully")
+                    replacements = get_replacements()
+            return
+
+        else:
+            await message.reply("You haven't added any replacement yet !")
+# list replacements
 
 
-@bot.on(events.NewMessage(incoming=True))
-async def op(event):
+@app.on_message(filters.command(["listreps"]))
+async def listreps(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        replacements = get_replace()
+        if replacements:
+            msg = "Here is the list of replacements you have added : \n\n"
+            for replacement in replacements:
+                msg += f"🟢 {replacement[0]} ➡️ {replacement[1]} \n"
+            msg += "`/delrep` - Delete a replacement from the list of replacements.\n"
+            print(msg)
+            await message.reply(msg, parse_mode=enums.ParseMode.HTML)
+        else:
+            await message.reply("You haven't added any replacement yet ❗️")
 
-    # get unencoded message
-    message = event.raw_text
-    print(message)
 
-    # replace emojis with custom emojis
-    message = emoji.demojize(message)
-    message = message.replace(":thumbs_up_sign:", "👍")
-    message = message.replace(":thumbs_down_sign:", "👎")
-    message = message.replace(":white_heavy_check_mark:", "✅")
-    # await bot.send_message(user_id, )
+@app.on_message(filters.incoming & ~filters.private & ~filters.forwarded & ~filters.poll)
+async def onMessage(client, message):
+    # add reaction to the sent message
+    await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
+    chat_id = message.chat.id
 
-    # unpickle
-    #event = pickle.load(open("event.pickle", "rb"))
-    if event.fwd_from or event.poll or not is_english(event.text) or is_in_blacklist(event.text):
-        return
-    channels = get_channels()
+    channels = channelList
     channel_ids = [channel[0] for channel in channels]
     # if channel is not in the list of channels
-    channel_id = str(event.chat_id)
+    channel_id = str(chat_id)
     if channel_id not in channel_ids:
         return
+
+    if message.caption or message.text:
+        text = message.caption or message.text
+        if is_in_blacklist(text) or not is_english(text):
+            return
+        #remove @channelusername
+        text = re.sub(r'@([A-Za-z0-9_]+)', '', text)
+        # if ends with multiple new lines remove them
+        text = re.sub(r'\n+$', '', text)
+        replaceList = get_replacements()
+        # get all emojis unicode
+        emojis = re.findall(emoj, text)
+        # remove duplicate emojis
+        for emoji in emojis:
+            try:
+                text = text.replace(emoji, replaceList[emoji])
+            except:
+                pass
+    else:
+        text = ""
+
+    print(text)
+
     # get channel tuple from channels list
     channel = [channel for channel in channels if channel[0] == channel_id][0]
     footer = channel[2]
-    text = event.text
-    #remove @channelusername
-    text = re.sub(r'@([A-Za-z0-9_]+)', '', text)
-    # if ends with multiple new lines remove them
-    text = re.sub(r'\n+$', '', text)
-
+    caption = text+"\n\n"+footer
     # if channel type is all
     if channel[1] == "all":
-        if event.photo:
-            try:
-                photo = event.media.photo
-                await bot.send_file(to_channel, photo,  caption=text+'\n\n'+footer, link_preview=False)
-            except:
-                await bot.send_message(to_channel, text+'\n\n'+footer, link_preview=False)
-        elif event.media:
-            try:
-                if event.media.webpage:
-                    await bot.send_message(to_channel, text+'\n\n'+footer, link_preview=False)
-                    return
-            except:
-                media = event.media.document
-                await bot.send_file(to_channel, media, caption=text+'\n\n'+footer, link_preview=False)
-                return
-        else:
-            await bot.send_message(to_channel, text+'\n\n'+footer, link_preview=False)
+        if message.media_group_id:
+            await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+        elif message.photo:
+            await client.send_photo(to_channel_id, photo=message.photo.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        elif message.video:
+            await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        elif message.audio:
+            await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        elif message.document:
+            await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        elif message.text:
+            await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, entities=message.entities, disable_web_page_preview=True)
+
     # if channel type is media_text
     elif channel[1] == "media_text":
-        if event.photo:
-            photo = event.media.photo
-            await bot.send_file(to_channel, photo,  caption=text+'\n\n'+footer, link_preview=False)
-        elif event.media:
-            try:
-                if event.media.webpage:
-                    await bot.send_message(to_channel, text+'\n\n'+footer, link_preview=False)
-                    return
-            except:
-                media = event.media.document
-                await bot.send_file(to_channel, media, caption=text+'\n\n'+footer, link_preview=False)
-                return
+        if message.media_group_id:
+            await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+        elif message.photo:
+            await client.send_photo(to_channel_id, photo=message.photo.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        elif message.video:
+            await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        elif message.audio:
+            await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        elif message.document:
+            await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
     # if channel type is media
     elif channel[1] == "media":
-        if event.photo:
-            photo = event.media.photo
-            await bot.send_file(to_channel, photo,  caption=footer, link_preview=False)
-        elif event.media:
-            try:
-                if event.media.webpage:
-                    return
-            except:
-                media = event.media.document
-                await bot.send_file(to_channel, media, caption=footer, link_preview=False)
-                return
+        if message.media_group_id:
+            await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+        elif message.photo:
+            await client.send_photo(to_channel_id, photo=message.photo.file_id, captions=caption)
+        elif message.video:
+            await client.send_video(to_channel_id, message.video.file_id, captions=caption)
+        elif message.audio:
+            await client.send_audio(to_channel_id, message.audio.file_id, captions=caption)
+        elif message.document:
+            await client.send_document(to_channel_id, message.document.file_id, captions=caption)
     # if channel type is text
     elif channel[1] == "text":
-        if event.photo:
-            return
-        elif event.media:
-            try:
-                if event.media.webpage:
-                    await bot.send_message(to_channel, text+'\n\n'+footer, link_preview=False)
-                    return
-            except:
-                return
-        else:
-            await bot.send_message(to_channel, text+'\n\n'+footer, link_preview=False)
+        if message.text:
+            await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, entities=message.entities, disable_web_page_preview=True)
+    await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
-
-# @bot.on(events.NewMessage(incoming=True, chats=[cryptomemes]))
-# async def nn(event):
-# if not event.is_private:
-#         try:
-            # if event.poll:
-            #     return
-#             if event.photo:
-#                 photo = event.media.photo
-#                 await bot.send_file(to_channel, photo, caption='#Crypto_Memes \n🔰Join us: @CryptoLeoNews', link_preview=False)
-#             elif event.media:
-#                 try:
-#                     if event.media.webpage:
-#                         await bot.send_message(to_channel, event.text+'\n\n#Crypto_Memes \n🔰Join us: @CryptoLeoNews', link_preview=False)
-#                         return
-#                 except:
-#                     media = event.media.document
-#                     await bot.send_file(to_channel, media, caption=event.text+'\n\n#Crypto_Memes \n🔰Join us: @CryptoLeoNews', link_preview=False)
-#                     return
-#         except:
-#             print(
-#                 "TO_CHANNEL ID is wrong or I can't send messages there (make me admin).")
-
-
-# @bot.on(events.NewMessage(incoming=True, chats=[from_channel_testing]))
-# async def cc(event):
-#     if not event.is_private:
-#         try:
-            # if event.fwd_from:
-            #     return
-#             if event.poll:
-#                 return
-        #     if event.photo:
-        #         photo = event.media.photo
-        #         await bot.send_file(to_channel, photo,  caption='#Crypto_Memes \n🔰Join us: @CryptoLeoNews', link_preview=False)
-        #     elif event.media:
-        #         try:
-        #             if event.media.webpage:
-        #                 await bot.send_message(to_channel, event.text, link_preview=False)
-        #                 return
-        #         except:
-        #             media = event.media.document
-        #             await bot.send_file(to_channel, media, caption=event.text, link_preview=False)
-        #             return
-        #     else:
-        #         await bot.send_message(to_channel, event.text, link_preview=False)
-        # except:
-        #     print(
-        #         "TO_CHANNEL ID is wrong or I can't send messages there (make me admin).")
-# messages=get_messages("https://t.me/s/catalystofficial")
-
-# #send messages to channel
-# for message in messages:
-#     bot.send_message(to_channel, message)
-
-
-async def main():
-    # Now you can use all client methods listed below, like for example...
-    await bot.send_message(to_channel, 'Hello to myself!')
-
-
-# print("Bot has been deployed.")
-bot.run_until_disconnected()
+app.run()  # Automatically start() and idle()
