@@ -399,7 +399,7 @@ async def listreps(client, message):
             msg = "Here is the list of replacements you have added : \n\n"
             for replacement in replacements:
                 msg += f"🟢 {replacement[0]} ➡️ {replacement[1]} \n\n"
-            msg += "`/delrep` - Delete a replacement from the list of replacements.\n"
+            msg += "`/delreps` - Delete a replacement from the list of replacements.\n"
             print(msg)
             await message.reply(msg, parse_mode=enums.ParseMode.HTML)
         else:
