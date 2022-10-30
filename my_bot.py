@@ -3,7 +3,7 @@ import re
 from telethon import TelegramClient, events, Button
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.functions.channels import JoinChannelRequest, LeaveChannelRequest
-from api import add_channel, delete_channel, get_channels, delete_all_channels, add_word, delete_word, get_words, delete_all_words
+from api import add_channel, delete_channel, get_channels, delete_all_channels, add_word, delete_word, get_words, delete_all_words, get_replace, add_replace
 from telethon.tl.types import MessageEntityMentionName
 
 print("Starting deployment...")
@@ -15,24 +15,17 @@ try:
     to_channel = int(os.environ["TO_CHANNEL"])
 
 except:
-    api_id = "19520584"
-    api_hash = "03ad3b5f7fa77d3876a80d3cdf269c35"
-    bot_token = "5058750116:AAGSKv5Jx71I0b05rVyWWRi-LNr-PZ8odAU"
+    api_id = "20369082"
+    api_hash = "070411cae8f4510368f4c94f82903b1a"
     from_channel = int(-1001710050962)
     to_channel = int(-1001460238566)
 
 
-cryptocrunchapp = -1001195964155  # media only
-coinsignals = -1001432529525
-cryptonews = -1001685592361
-cryptomemes = -1001133328874  # media only
-from_channel_testing = -1001446018493
-conversation_state = {}
 
 bot = TelegramClient('botop', api_id, api_hash).start()
 
-words = get_words()
-
+wordBlacklist = get_words()
+wordReplace = get_replace()
 emoj = re.compile("["
                   u"\U0001F600-\U0001F64F"  # emoticons
                   u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -66,13 +59,15 @@ def is_english(text):
     else:
         return True
 
+
 def is_in_blacklist(text):
-    #check words
+    # check words
     if words:
         for word in words:
             if word[0] in text:
                 return True
     return False
+
 
 @bot.on(events.NewMessage(pattern="^/start$|hi|hello|hey|HI|HELLO|HEY", func=lambda e: e.is_private))
 async def _(event):
@@ -84,15 +79,17 @@ async def _(event):
         await event.reply("Hi ," + sender.username + " 👋 !")
         await bot.send_message(sender, "use `/help` to see all commands")
         return
-    await event.reply(f"Hi ! I am a bot of Mr.Leo Glarrix,\n please contact @Leoglarrix")
+    await event.reply(f"Hi ! I am a bot of Mr. Nisal Chandrasekara,\n please contact @CMNisal to get access to this bot")
 
 
 @bot.on(events.NewMessage(pattern="^/help$", func=lambda e: e.is_private))
 async def help(event):
     if event.chat_id == 1076120105 or event.chat_id == 747953161:
-        await event.reply("**Help menu**\n\n😎This bot will send all new posts in one channel to the CryptoLeo Market Updates.😊 \n\n**Commands**\n\n🪛`/add` - Add a channel to the list of channels to be forwarded.\n🪛`/delete` - Delete a channel from the list of channels to be forwarded.\n🪛`/list` - List all channels that are being forwarded.\n`/addword` - Add a word to the blacklist.\n🪛`/deleteword` - Delete a word from the blacklist.\n🪛`/listwords` - List all words in the blacklist.\n🪛`/deleteallword` - Delete all words from the blacklist.\n🪛`/deleteall` - Delete all channels from the list of channels to be forwarded.\n\n**Note**\n\n🔸This bot will only forward posts from channels that are in English.\n🔸This bot will not forward posts that contain words in the blacklist.\n\n**Support**\n\n🔹If you have any questions, please contact @Leoglarrix")
+        await event.reply("**Help menu**\n\n😎This bot will send all new posts in one channel to the .😊 \n\n**Commands**\n\n🪛`/add` - Add a channel to the list of channels to be forwarded.\n🪛`/delete` - Delete a channel from the list of channels to be forwarded.\n🪛`/list` - List all channels that are being forwarded.\n`/addword` - Add a word to the blacklist.\n🪛`/delword` - Delete a word from the blacklist.\n🪛`/listwords` - List all words in the blacklist.\n🪛`/deleteallword` - Delete all words from the blacklist.\n🪛`/deleteall` - Delete all channels from the list of channels to be forwarded.\n\n**Note**\n\n🔸This bot will only forward posts from channels that are in English.\n🔸This bot will not forward posts that contain words in the blacklist.\n\n**Support**\n\n🔹If you have any questions, please contact @Leoglarrix")
 
-#use exactly this name /add
+# use exactly this name /add
+
+
 @bot.on(events.NewMessage(pattern="^/add$"))
 async def add(event):
     if event.chat_id == 1076120105 or event.chat_id == 747953161:
@@ -246,7 +243,9 @@ async def delete(event):
         else:
             await event.reply("You haven't added any channel yet !")
 
-#add word to blacklist
+# add word to blacklist
+
+
 @bot.on(events.NewMessage(pattern="^/addword$"))
 async def addword(event):
     if event.chat_id == 1076120105 or event.chat_id == 747953161:
@@ -264,7 +263,9 @@ async def addword(event):
             await conv.send_message("✅Word added successfully")
             words = get_words()
 
-#delete word from blacklist
+# delete word from blacklist
+
+
 @bot.on(events.NewMessage(pattern="^/delword$"))
 async def delword(event):
     if event.chat_id == 1076120105 or event.chat_id == 747953161:
@@ -314,7 +315,9 @@ async def delword(event):
         else:
             await event.reply("You haven't added any word yet !")
 
-#list words
+# list words
+
+
 @bot.on(events.NewMessage(pattern="^/listwords$"))
 async def listwords(event):
     if event.chat_id == 1076120105 or event.chat_id == 747953161:
@@ -332,9 +335,54 @@ async def listwords(event):
         else:
             await event.reply("You haven't added any word yet ❗️")
 
+# add replacement
+
+
+@bot.on(events.NewMessage(pattern="^/addrep$"))
+async def addrep(event):
+    if event.chat_id == 1076120105 or event.chat_id == 747953161:
+
+        sender = await event.get_sender()
+        SENDER = sender.id
+        async with bot.conversation(await event.get_chat(), exclusive=True) as conv:
+            await conv.send_message("Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \nExample : `word|replacement` or `word:replacement` or `word=replacement`")
+            response = await conv.get_response()
+            if response.text == "/cancel":
+                await conv.send_message("Cancelled❎")
+                return
+            word = response.text
+            if "|" in word:
+                word = word.split("|")
+            elif ":" in word:
+                word = word.split(":")
+            elif "=" in word:
+                word = word.split("=")
+            else:
+                await conv.send_message("Invalid format ❗️")
+                return
+            if len(word) != 2:
+                await conv.send_message("Invalid format ❗️")
+                return
+            add_replacement(word[0], word[1])
+            await conv.send_message("✅Replacement added successfully")
+
 
 @bot.on(events.NewMessage(incoming=True))
 async def op(event):
+
+    # get unencoded message
+    message = event.raw_text
+    print(message)
+
+    # replace emojis with custom emojis
+    message = emoji.demojize(message)
+    message = message.replace(":thumbs_up_sign:", "👍")
+    message = message.replace(":thumbs_down_sign:", "👎")
+    message = message.replace(":white_heavy_check_mark:", "✅")
+    # await bot.send_message(user_id, )
+
+    # unpickle
+    #event = pickle.load(open("event.pickle", "rb"))
     if event.fwd_from or event.poll or not is_english(event.text) or is_in_blacklist(event.text):
         return
     channels = get_channels()

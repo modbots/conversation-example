@@ -5,7 +5,7 @@ import psycopg2
 if "DATABASE_URL" in os.environ:
     DATABASE_URL = os.environ['DATABASE_URL']
 else:
-    DATABASE_URL = "postgres://uablnhutlxmzir:a34362810a1afa26506dcb6dd8dbbd6968e4833171fc4cdd5e60903a362fb916@ec2-34-247-72-29.eu-west-1.compute.amazonaws.com:5432/db13rt0ge6i9ig"
+    DATABASE_URL = "postgres://tjcrbtchxjetna:ffb450747d26895a29d3a3b6c5a6f1a6619d6870131c04afba453d54cca98e6a@ec2-54-76-43-89.eu-west-1.compute.amazonaws.com:5432/dfsf5klh4quf4q"
 
 
 #create connection
@@ -14,12 +14,13 @@ conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 #create table channels if not exists
 cur = conn.cursor()
-cur.execute("CREATE TABLE IF NOT EXISTS channels (channel_id TEXT, channel_type TEXT,footer TEXT, PRIMARY KEY (channel_id))")
+cur.execute("CREATE TABLE IF NOT EXISTS channels (channel_id TEXT, channel_type TEXT,footer TEXT,channel_name  TEXT,PRIMARY KEY (channel_id))")
 conn.commit()
 cur.close()
 
 
-def add_channel(channel_id, channel_type, footer):
+def add_channel(channel_id, channel_type, footer, channel_name):
+   
     cur = conn.cursor()
     #if channel already exists return false
     cur.execute("SELECT * FROM channels WHERE channel_id = %s", (channel_id,))
@@ -28,7 +29,7 @@ def add_channel(channel_id, channel_type, footer):
     cur.close()
     #else add channel
     cur = conn.cursor()
-    cur.execute("INSERT INTO channels (channel_id, channel_type, footer) VALUES (%s, %s, %s)", (channel_id, channel_type, footer))
+    cur.execute("INSERT INTO channels (channel_id, channel_type, footer, channel_name) VALUES (%s, %s, %s, %s)", (channel_id, channel_type, footer, channel_name))
     conn.commit()
     cur.close()
     return True
@@ -97,3 +98,56 @@ def delete_all_words():
 
 # delete_channel("-1001446018493"")
 print(get_channels())
+
+#add word replace
+cur = conn.cursor()
+cur.execute("CREATE TABLE IF NOT EXISTS replace (word TEXT, replace TEXT,PRIMARY KEY (word))")
+conn.commit()
+cur.close()
+
+def add_replace(word, replace):
+    cur = conn.cursor()
+    #if word already exists return false
+    cur.execute("SELECT * FROM replace WHERE word = %s", (word,))
+    if cur.fetchone() is not None:
+        cur.execute("UPDATE replace SET replace = %s WHERE word = %s", (replace, word))
+        conn.commit()
+        cur.close()
+        return True
+    #else add word
+    cur = conn.cursor()
+    cur.execute("INSERT INTO replace (word, replace) VALUES (%s, %s)", (word, replace))
+    conn.commit()
+    cur.close()
+    return True
+
+def get_replace():
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM replace")
+    rows = cur.fetchall()
+    cur.close()
+    return rows
+
+def delete_replace(word):
+    cur = conn.cursor()
+    cur.execute("DELETE FROM replace WHERE word = %s", (word,))
+    conn.commit()
+    cur.close()
+    return True
+
+def delete_all_replace():
+    cur = conn.cursor()
+    cur.execute("DELETE FROM replace")
+    conn.commit()
+    cur.close()
+
+def get_replacements():
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM replace")
+    rows = cur.fetchall()
+    #send as dict
+    replacements = {}
+    for row in rows:
+        replacements[row[0]] = row[1]
+    cur.close()
+    return replacements
