@@ -141,7 +141,13 @@ async def add(client, message):
             await client.listen.Cancel(filters.user(chat_id))
             await app.send_message(chat_id, "Cancelled❎")
             return
-        channel_footer = answer.text
+
+        channel_footer=answer.text
+        if answer.entities:
+            for entity in answer.entities:
+                if entity.custom_emoji_id:
+                    channel_footer = answer.text.replace(entity.offset-1, f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+        
         add_channel(str(channel_id), channel_type,
                     channel_footer, channel_name)
         await app.send_message(chat_id, "✅Channel added successfully  \nuse  `/list` to see the list of channels")
