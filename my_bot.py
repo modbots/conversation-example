@@ -79,15 +79,15 @@ async def help(client, message):
     if chat_id == 1076120105 or chat_id == 196536622:
         await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the .😊 \n\n" +
                                  "**Commands**\n\n" +
-                                 "🪛`/add` - Add a channel to the list of channels to be forwarded.\n" +
-                                 "🪛`/delete` - Delete a channel from the list of channels to be forwarded.\n" +
-                                 "🪛`/list` - List all channels that are being forwarded.\n`/addword` - Add a word to the blacklist.\n" +
-                                 "🪛`/delword` - Delete a word from the blacklist.\n🪛`/listwords` - List all words in the blacklist.\n" +
-                                 "🪛`/deleteallword` - Delete all words from the blacklist.\n" +
-                                 "🪛`/deleteall` - Delete all channels from the list of channels to be forwarded.\n\n" +
-                                 "🪛`/addrep` - Add a word to the replace list.\n" +
-                                 "🪛`/delreps` - Delete a word from the replace list.\n" +
-                                 "🪛`/listreps` - List all words in the replace list.\n" +
+                                 "🪛add - Add a channel to the list of channels to be forwarded.\n" +
+                                 "🪛delete - Delete a channel from the list of channels to be forwarded.\n" +
+                                 "🪛list - List all channels that are being forwarded.\naddword - Add a word to the blacklist.\n" +
+                                 "🪛delword - Delete a word from the blacklist.\n🪛listwords - List all words in the blacklist.\n" +
+                                 "🪛deleteallword - Delete all words from the blacklist.\n" +
+                                 "🪛deleteall - Delete all channels from the list of channels to be forwarded.\n\n" +
+                                 "🪛addrep - Add a word to the replace list.\n" +
+                                 "🪛delreps - Delete a word from the replace list.\n" +
+                                 "🪛listreps - List all words in the replace list.\n" +
                                  "**Note**\n\n🔸This bot will only forward posts from channels that are in English.\n" +
                                  "🔸This bot will not forward posts that contain words in the blacklist." +
                                  "\n\n**Support**\n\n🔹If you have any questions, please contact @CMNisal")
