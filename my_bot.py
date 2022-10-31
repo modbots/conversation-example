@@ -79,21 +79,27 @@ async def help(client, message):
     if chat_id == 1076120105 or chat_id == 196536622:
         await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the .😊 \n\n" +
                                  "**Commands**\n\n" +
-                                 "🪛add - Add a channel to the list of channels to be forwarded.\n" +
-                                 "🪛delete - Delete a channel from the list of channels to be forwarded.\n" +
-                                 "🪛list - List all channels that are being forwarded.\naddword - Add a word to the blacklist.\n" +
-                                 "🪛delword - Delete a word from the blacklist.\n🪛listwords - List all words in the blacklist.\n" +
-                                 "🪛deleteallword - Delete all words from the blacklist.\n" +
-                                 "🪛deleteall - Delete all channels from the list of channels to be forwarded.\n\n" +
-                                 "🪛addrep - Add a word to the replace list.\n" +
-                                 "🪛delreps - Delete a word from the replace list.\n" +
-                                 "🪛listreps - List all words in the replace list.\n" +
+                                 " \t\t**Manage Channels**\n" +
+                                 "🪛/add - Add a channel to the list of channels to be forwarded.\n" +
+                                 "🪛/delete - Delete a channel from the list of channels to be forwarded.\n" +
+                                 "🪛/list - List all channels that are being forwarded.\n" +
+                                 "🪛/deleteall - Delete all channels from the list of channels to be forwarded.\n\n" +
+                                 "\t\t**Manage Word Blacklist**\n" +
+                                 "🪛/addword - Add a word to the blacklist.\n" +
+                                 "🪛/delword - Delete a word from the blacklist.\n" +
+                                 "🪛/listwords - List all words in the blacklist.\n" +
+                                 "🪛/deleteallword - Delete all words from the blacklist.\n\n" +
+                                 "\t\t**Manage Word Replace**\n" +
+                                 "🪛/addrep - Add a word to the replace list.\n" +
+                                 "🪛/delreps - Delete a word from the replace list.\n" +
+                                 "🪛/listreps - List all words in the replace list.\n" +
                                  "**Note**\n\n🔸This bot will only forward posts from channels that are in English.\n" +
                                  "🔸This bot will not forward posts that contain words in the blacklist." +
+                                 "🔸This bot will replace words in the replace list with the corresponding word in the replace list." +
                                  "\n\n**Support**\n\n🔹If you have any questions, please contact @CMNisal")
 
 
-@app.on_message(filters.command(["add"]))
+@ app.on_message(filters.command(["add"]))
 async def add(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
@@ -142,12 +148,13 @@ async def add(client, message):
             await app.send_message(chat_id, "Cancelled❎")
             return
 
-        channel_footer=answer.text
+        channel_footer = answer.text
         if answer.entities:
             for entity in answer.entities:
                 if entity.custom_emoji_id:
-                    channel_footer = channel_footer.replace(channel_footer[entity.offset], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
-        
+                    channel_footer = channel_footer.replace(
+                        channel_footer[entity.offset], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+
         add_channel(str(channel_id), channel_type,
                     channel_footer, channel_name)
         await app.send_message(chat_id, "✅Channel added successfully  \nuse  `/list` to see the list of channels")
@@ -156,6 +163,8 @@ async def add(client, message):
         # await message.reply_text("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
 
 # list
+
+
 @app.on_message(filters.command(["list"]))
 async def list(client, message):
     chat_id = message.chat.id
@@ -223,6 +232,8 @@ async def delete(client, message):
             await message.reply("You haven't added any channel yet !")
 
 # add word to blacklist
+
+
 @app.on_message(filters.command(["addword"]))
 async def addword(client, message):
     chat_id = message.chat.id
@@ -238,6 +249,8 @@ async def addword(client, message):
         words = get_words()
 
 # delete words from blacklist
+
+
 @app.on_message(filters.command(["delword"]))
 async def delword(client, message):
 
@@ -285,6 +298,8 @@ async def delword(client, message):
             await message.reply("You haven't added any word yet !")
 
 # list words
+
+
 @app.on_message(filters.command(["listwords"]))
 async def listwords(client, message):
     chat_id = message.chat.id
@@ -300,12 +315,14 @@ async def listwords(client, message):
             await message.reply("You haven't added any word yet ❗️")
 
 # add replacement
+
+
 @app.on_message(filters.command(["addrep"]))
 async def addrep(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
 
-        await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : 😲=<emoji id='5381855971943389791'>🔥</emoji>",parse_mode=enums.ParseMode.HTML)
+        await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : 😲=<emoji id='5381855971943389791'>🔥</emoji>", parse_mode=enums.ParseMode.HTML)
         answer = await listen_message(client, chat_id, timeout=None)
 
         if answer.text == "/cancel":
@@ -339,6 +356,8 @@ async def addrep(client, message):
         replaceList = get_replacements()
 
 # delete replacement
+
+
 @app.on_message(filters.command(["delreps"]))
 async def delrep(client, message):
     chat_id = message.chat.id
@@ -385,6 +404,8 @@ async def delrep(client, message):
             await message.reply("You haven't added any replacement yet !")
 
 # list replacements
+
+
 @app.on_message(filters.command(["listreps"]))
 async def listreps(client, message):
     chat_id = message.chat.id
