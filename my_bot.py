@@ -94,9 +94,9 @@ async def help(client, message):
                                  "🪛/delreps - Delete a word from the replace list.\n" +
                                  "🪛/listreps - List all words in the replace list.\n\n" +
                                  "**Note**\n🔸This bot will only forward posts from channels that are in English.\n" +
-                                 "🔸This bot will not forward posts that contain words in the blacklist." +
+                                 "🔸This bot will not forward posts that contain words in the blacklist.\n" +
                                  "🔸This bot will replace words in the replace list with the corresponding word in the replace list." +
-                                 "\n**Support**\n\n🔹If you have any questions, please contact @CMNisal")
+                                 "\n\n**Support**\n🔹If you have any questions, please contact @CMNisal")
 
 
 @ app.on_message(filters.command(["add"]))
