@@ -150,8 +150,6 @@ async def add(client, message):
         # await message.reply_text("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
 
 # list
-
-
 @app.on_message(filters.command(["list"]))
 async def list(client, message):
     chat_id = message.chat.id
@@ -219,8 +217,6 @@ async def delete(client, message):
             await message.reply("You haven't added any channel yet !")
 
 # add word to blacklist
-
-
 @app.on_message(filters.command(["addword"]))
 async def addword(client, message):
     chat_id = message.chat.id
@@ -236,8 +232,6 @@ async def addword(client, message):
         words = get_words()
 
 # delete words from blacklist
-
-
 @app.on_message(filters.command(["delword"]))
 async def delword(client, message):
 
@@ -285,8 +279,6 @@ async def delword(client, message):
             await message.reply("You haven't added any word yet !")
 
 # list words
-
-
 @app.on_message(filters.command(["listwords"]))
 async def listwords(client, message):
     chat_id = message.chat.id
@@ -302,8 +294,6 @@ async def listwords(client, message):
             await message.reply("You haven't added any word yet ❗️")
 
 # add replacement
-
-
 @app.on_message(filters.command(["addrep"]))
 async def addrep(client, message):
     chat_id = message.chat.id
@@ -343,8 +333,6 @@ async def addrep(client, message):
         replaceList = get_replacements()
 
 # delete replacement
-
-
 @app.on_message(filters.command(["delreps"]))
 async def delrep(client, message):
     chat_id = message.chat.id
@@ -389,9 +377,8 @@ async def delrep(client, message):
 
         else:
             await message.reply("You haven't added any replacement yet !")
+
 # list replacements
-
-
 @app.on_message(filters.command(["listreps"]))
 async def listreps(client, message):
     chat_id = message.chat.id
