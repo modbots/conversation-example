@@ -443,10 +443,6 @@ async def onMessage(client, message):
     if channel_id not in channel_ids:
         return
 
-    if message.entities:
-        for entity in message.entities:
-            message.entities.remove(entity)
-
     #convert all entities to HTML
     if message.entities:
         for entity in message.entities:
