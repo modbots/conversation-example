@@ -97,7 +97,6 @@ def delete_all_words():
 
 
 # delete_channel("-1001446018493"")
-print(get_channels())
 
 #add word replace
 cur = conn.cursor()

@@ -24,6 +24,8 @@ Conversation(app)
 wordBlacklist = get_words()
 wordReplace = get_replace()
 channelList = get_channels()
+channel_ids = [channel[0] for channel in channelList]
+
 replaceList =get_replacements()
 emoj = re.compile("["
                   u"\U0001F600-\U0001F64F"  # emoticons
@@ -159,6 +161,8 @@ async def add(client, message):
                     channel_footer, channel_name)
         await app.send_message(chat_id, "✅Channel added successfully  \nuse  `/list` to see the list of channels")
         channelList = get_channels()
+        channel_ids = [channel[0] for channel in channelList]
+
         return
         # await message.reply_text("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
 
@@ -226,6 +230,8 @@ async def delete(client, message):
                     await app.leave_chat(channel_id, delete=True)
                     await app.send_message(chat_id, "✅Channel "+channel_id+" deleted successfully")
                     channelList = get_channels()
+                    channel_ids = [channel[0] for channel in channelList]
+
             return
 
         else:
@@ -428,39 +434,77 @@ async def onMessage(client, message):
     await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
     chat_id = message.chat.id
 
-    channels = channelList
-    channel_ids = [channel[0] for channel in channels]
+    import pickle
+    pickle.dump(message, open(f"{chat_id}channel_ids.pkl", "wb"))
+
     # if channel is not in the list of channels
     channel_id = str(chat_id)
     if channel_id not in channel_ids:
         return
 
-    if message.caption or message.text:
-        text = message.caption or message.text
-        if is_in_blacklist(text) or not is_english(text):
-            return
-        #remove @channelusername
-        text = re.sub(r'@([A-Za-z0-9_]+)', '', text)
-        # if ends with multiple new lines remove them
-        text = re.sub(r'\n+$', '', text)
-        df = pd.DataFrame({"Text": [text]})
-        df["Text"] = df["Text"].replace(replaceList, regex=True)
-        text=df["Text"][0]
-    else:
-        text = ""
+    if message.entities:
+        for entity in message.entities:
+            message.entities.remove(entity)
 
-    print(text)
+    #convert all entities to HTML
+    if message.entities:
+        for entity in message.entities:
+            if entity.type == enums.MessageEntityType.BOLD:
+                message.text = message.text[:entity.offset] + "<b>" + message.text[entity.offset:entity.offset+entity.length] + "</b>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.ITALIC:
+                message.text = message.text[:entity.offset] + "<i>" + message.text[entity.offset:entity.offset+entity.length] + "</i>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.CODE:
+                message.text = message.text[:entity.offset] + "<code>" + message.text[entity.offset:entity.offset+entity.length] + "</code>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.PRE:
+                message.text = message.text[:entity.offset] + "<pre>" + message.text[entity.offset:entity.offset+entity.length] + "</pre>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.URL:
+                message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.TEXT_LINK:
+                message.text = message.text[:entity.offset] + "<a href=\"tg://user?id="+str(entity.user_id)+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.TEXT_MENTION:
+                message.text = message.text[:entity.offset] + "<u>" + message.text[entity.offset:entity.offset+entity.length] + "</u>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.MENTION:
+                message.text = message.text[:entity.offset] + "<s>" + message.text[entity.offset:entity.offset+entity.length] + "</s>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.HASHTAG:
+                message.text = message.text[:entity.offset] + "<a href=\"https://t.me/hashtag/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+            elif entity.type == enums.MessageEntityType.CASHTAG:
+                message.text = message.text[:entity.offset] + "<a href=\"https://t.me/cash/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+             
+    caption="" 
+    if message.caption :
+        #remove @channelusername
+        message.caption = re.sub(r'@([A-Za-z0-9_]+)', '', message.caption)
+        # if ends with multiple new lines remove them
+        message.caption = re.sub(r'\n+$', '', message.caption)
+        df = pd.DataFrame({"Text": [message.caption]})
+        df["Text"] = df["Text"].replace(replaceList, regex=True)
+        message.caption=df["Text"][0]
+        caption = message.caption
+  
+
+    if message.text:
+        #remove @channelusername
+        message.text = re.sub(r'@([A-Za-z0-9_]+)', '', message.text)
+        # if ends with multiple new lines remove them
+        message.text = re.sub(r'\n+$', '', message.text)
+        df = pd.DataFrame({"Text": [message.text]})
+        df["Text"] = df["Text"].replace(replaceList, regex=True)
+        message.text=df["Text"][0]
+        caption = message.text
+
 
     # get channel tuple from channels list
-    channel = [channel for channel in channels if channel[0] == channel_id][0]
+    channel = [channel for channel in channelList if channel[0] == channel_id][0]
     footer = channel[2]
-    caption = text+"\n\n"+footer
+    
+    caption = caption+"\n\n"+footer
+    print(caption)
     # if channel type is all
     if channel[1] == "all":
         if message.media_group_id:
             await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
         elif message.photo:
-            await client.send_photo(to_channel_id, photo=message.photo.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            await client.send_photo(to_channel_id, photo=message.photo.file_id, parse_mode=enums.ParseMode.HTML, caption=caption)
         elif message.video:
             await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
         elif message.audio:
@@ -468,7 +512,7 @@ async def onMessage(client, message):
         elif message.document:
             await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
         elif message.text:
-            await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, entities=message.entities, disable_web_page_preview=True)
+            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
 
     # if channel type is media_text
     elif channel[1] == "media_text":
