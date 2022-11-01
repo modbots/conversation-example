@@ -444,7 +444,7 @@ async def onMessage(client, message):
         # if ends with multiple new lines remove them
         text = re.sub(r'\n+$', '', text)
         df = pd.DataFrame({"Text": [text]})
-        df["Text"] = df["Text"].replace(dic, regex=True)
+        df["Text"] = df["Text"].replace(replaceList, regex=True)
         text=df["Text"][0]
     else:
         text = ""
