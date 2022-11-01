@@ -443,29 +443,37 @@ async def onMessage(client, message):
     if channel_id not in channel_ids:
         return
 
-    #convert all entities to HTML
     if message.entities:
         for entity in message.entities:
-            if entity.type == enums.MessageEntityType.BOLD:
-                message.text = message.text[:entity.offset] + "<b>" + message.text[entity.offset:entity.offset+entity.length] + "</b>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.ITALIC:
-                message.text = message.text[:entity.offset] + "<i>" + message.text[entity.offset:entity.offset+entity.length] + "</i>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.CODE:
-                message.text = message.text[:entity.offset] + "<code>" + message.text[entity.offset:entity.offset+entity.length] + "</code>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.PRE:
-                message.text = message.text[:entity.offset] + "<pre>" + message.text[entity.offset:entity.offset+entity.length] + "</pre>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.URL:
-                message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.TEXT_LINK:
-                message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.TEXT_MENTION:
-                message.text = message.text[:entity.offset] + "<u>" + message.text[entity.offset:entity.offset+entity.length] + "</u>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.MENTION:
-                message.text = message.text[:entity.offset] + "<s>" + message.text[entity.offset:entity.offset+entity.length] + "</s>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.HASHTAG:
-                message.text = message.text[:entity.offset] + "<a href=\"https://t.me/hashtag/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
-            elif entity.type == enums.MessageEntityType.CASHTAG:
-                message.text = message.text[:entity.offset] + "<a href=\"https://t.me/cash/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+            if entity.type == enums.MessageEntityType.HASHTAG:
+                message.entities.remove(entity)
+            if entity.type == enums.MessageEntityType.CASHTAG:
+                message.entities.remove(entity)
+     
+
+    #convert all entities to HTML
+    # if message.entities:
+    #     for entity in message.entities:
+    #         if entity.type == enums.MessageEntityType.BOLD:
+    #             message.text = message.text[:entity.offset] + "<b>" + message.text[entity.offset:entity.offset+entity.length] + "</b>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.ITALIC:
+    #             message.text = message.text[:entity.offset] + "<i>" + message.text[entity.offset:entity.offset+entity.length] + "</i>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.CODE:
+    #             message.text = message.text[:entity.offset] + "<code>" + message.text[entity.offset:entity.offset+entity.length] + "</code>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.PRE:
+    #             message.text = message.text[:entity.offset] + "<pre>" + message.text[entity.offset:entity.offset+entity.length] + "</pre>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.URL:
+    #             message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.TEXT_LINK:
+    #             message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.TEXT_MENTION:
+    #             message.text = message.text[:entity.offset] + "<u>" + message.text[entity.offset:entity.offset+entity.length] + "</u>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.MENTION:
+    #             message.text = message.text[:entity.offset] + "<s>" + message.text[entity.offset:entity.offset+entity.length] + "</s>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.HASHTAG:
+    #             message.text = message.text[:entity.offset] + "<a href=\"https://t.me/hashtag/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+    #         elif entity.type == enums.MessageEntityType.CASHTAG:
+    #             message.text = message.text[:entity.offset] + "<a href=\"https://t.me/cash/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
              
     caption="" 
     if message.caption :
@@ -509,7 +517,7 @@ async def onMessage(client, message):
         elif message.document:
             await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
         elif message.text:
-            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
+            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True,entities=message.entities)
 
     # if channel type is media_text
     elif channel[1] == "media_text":
