@@ -444,11 +444,10 @@ async def onMessage(client, message):
         # if ends with multiple new lines remove them
         text = re.sub(r'\n+$', '', text)
         # get all emojis unicode
-        emojis = re.findall(emoj, text)
         # remove duplicate emojis
-        for emoji in emojis:
+        for replaceItem in replaceList:
             try:
-                text = text.replace(emoji, replaceList[emoji])
+                text = text.replace(replaceItem, replaceList[replaceItem])
             except:
                 pass
     else:
