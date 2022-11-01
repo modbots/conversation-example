@@ -1,6 +1,14 @@
+autopep8==2.0.0
 convopyro @ git+https://github.com/Ripeey/Conversation-Pyrogram@a39cc9e0c1a689c9904dd5be5419246868daecfb
+numpy==1.23.4
+pandas==1.5.1
 psycopg2==2.9.5
 pyaes==1.6.1
+pycodestyle==2.9.1
 Pyrogram==2.0.59
 PySocks==1.7.1
+python-dateutil==2.8.2
+pytz==2022.6
+six==1.16.0
 TgCrypto==1.2.4
+tomli==2.0.1

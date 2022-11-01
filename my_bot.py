@@ -9,7 +9,7 @@ from api import add_channel,\
 import re
 from convopyro import Conversation
 from convopyro import listen_message
-
+import pandas as pd
 
 api_id = 20369082
 api_hash = "070411cae8f4510368f4c94f82903b1a"
@@ -24,7 +24,7 @@ Conversation(app)
 wordBlacklist = get_words()
 wordReplace = get_replace()
 channelList = get_channels()
-replaceList ={ord(k): ord(v[0]) for k, v in get_replacements().items()}
+replaceList ={r"\b{}\b".format(k): v for k, v in get_replacements().items()}
 emoj = re.compile("["
                   u"\U0001F600-\U0001F64F"  # emoticons
                   u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -353,7 +353,7 @@ async def addrep(client, message):
 
         add_replace(wordList[0], wordList[1])
         await app.send_message(chat_id, "✅Replacement added successfully")
-        replaceList = {ord(k): ord(v[0]) for k, v in get_replacements().items()}
+        replaceList = {r"\b{}\b".format(k): v for k, v in get_replacements().items()}
 
 # delete replacement
 
@@ -397,7 +397,7 @@ async def delrep(client, message):
                     replacement = replacements[index-1][0]
                     delete_replace(replacement)
                     await app.send_message(chat_id, "✅Replacement "+replacement+" deleted successfully")
-                    replaceList = {ord(k): ord(v[0]) for k, v in get_replacements().items()}
+                    replaceList = {r"\b{}\b".format(k): v for k, v in get_replacements().items()}
             return
 
         else:
@@ -443,7 +443,9 @@ async def onMessage(client, message):
         text = re.sub(r'@([A-Za-z0-9_]+)', '', text)
         # if ends with multiple new lines remove them
         text = re.sub(r'\n+$', '', text)
-        text.translate(replaceList)
+        df = pd.DataFrame({"Text": [text]})
+        df["Text"] = df["Text"].replace(dic, regex=True)
+        text=df["Text"][0]
     else:
         text = ""
 
