@@ -434,9 +434,6 @@ async def onMessage(client, message):
     await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
     chat_id = message.chat.id
 
-    import pickle
-    pickle.dump(message, open(f"{chat_id}channel_ids.pkl", "wb"))
-
     # if channel is not in the list of channels
     channel_id = str(chat_id)
     if channel_id not in channel_ids:
