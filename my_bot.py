@@ -24,7 +24,7 @@ Conversation(app)
 wordBlacklist = get_words()
 wordReplace = get_replace()
 channelList = get_channels()
-replaceList ={r"\b{}\b".format(k): v for k, v in get_replacements().items()}
+replaceList =get_replacements()
 emoj = re.compile("["
                   u"\U0001F600-\U0001F64F"  # emoticons
                   u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -353,7 +353,7 @@ async def addrep(client, message):
 
         add_replace(wordList[0], wordList[1])
         await app.send_message(chat_id, "✅Replacement added successfully")
-        replaceList = {r"\b{}\b".format(k): v for k, v in get_replacements().items()}
+        replaceList =get_replacements()
 
 # delete replacement
 
@@ -397,7 +397,7 @@ async def delrep(client, message):
                     replacement = replacements[index-1][0]
                     delete_replace(replacement)
                     await app.send_message(chat_id, "✅Replacement "+replacement+" deleted successfully")
-                    replaceList = {r"\b{}\b".format(k): v for k, v in get_replacements().items()}
+                    replaceList = get_replacements()
             return
 
         else:
