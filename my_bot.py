@@ -517,7 +517,7 @@ async def onMessage(client, message):
         elif message.document:
             await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
         elif message.text:
-            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True,entities=message.entities)
+            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.DEFAULT, disable_web_page_preview=True,entities=message.entities)
 
     # if channel type is media_text
     elif channel[1] == "media_text":
