@@ -461,7 +461,7 @@ async def onMessage(client, message):
             elif entity.type == enums.MessageEntityType.URL:
                 message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
             elif entity.type == enums.MessageEntityType.TEXT_LINK:
-                message.text = message.text[:entity.offset] + "<a href=\"tg://user?id="+str(entity.user_id)+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
+                message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
             elif entity.type == enums.MessageEntityType.TEXT_MENTION:
                 message.text = message.text[:entity.offset] + "<u>" + message.text[entity.offset:entity.offset+entity.length] + "</u>" + message.text[entity.offset+entity.length:]
             elif entity.type == enums.MessageEntityType.MENTION:
