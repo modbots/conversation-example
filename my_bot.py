@@ -156,7 +156,7 @@ async def add(client, message):
             for entity in answer.entities:
                 if entity.custom_emoji_id:
                     channel_footer = channel_footer.replace(
-                        channel_footer[entity.offset], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+                        channel_footer[entity.offset-1], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
 
         add_channel(str(channel_id), channel_type,
                     channel_footer, channel_name)
