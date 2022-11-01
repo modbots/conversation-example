@@ -116,8 +116,9 @@ async def add(client, message):
         if answer.forward_from_chat:
             channel_id = answer.forward_from_chat.id
         else:
-            channel_id = answer.chat.id
+            channel_id = answer.text
         channel_name = answer.chat.title
+        print(channel_name)
         # try to join channel
         try:
             await app.join_chat(channel_id)
