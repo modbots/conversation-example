@@ -10,6 +10,12 @@ import re
 from convopyro import Conversation
 from convopyro import listen_message
 import pandas as pd
+from random import randint
+
+def random_with_N_digits(n):
+    range_start = 10**(n-1)
+    range_end = (10**n)-1
+    return randint(range_start, range_end)
 
 api_id = 20369082
 api_hash = "070411cae8f4510368f4c94f82903b1a"
@@ -158,7 +164,7 @@ async def add(client, message):
             for entity in answer.entities:
                 if entity.custom_emoji_id:
                     channel_footer = channel_footer.replace(
-                        channel_footer[entity.offset-1], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+                        channel_footer[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
                     print("offset "+entity.offset)
 
         add_channel(str(channel_id), channel_type,
@@ -437,7 +443,8 @@ async def onMessage(client, message):
     # add reaction to the sent message
     await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
     chat_id = message.chat.id
-
+    import pickle
+    pickle.dump(message, open(f"{chat_id}message.p", "wb"))
     # if channel is not in the list of channels
     channel_id = str(chat_id)
     if channel_id not in channel_ids:
@@ -450,59 +457,76 @@ async def onMessage(client, message):
             if entity.type == enums.MessageEntityType.CASHTAG:
                 message.entities.remove(entity)
      
+    
+    orginal_text = message.text or message.caption or ""
+    entity_html_dict = {}
+    replacing_text = orginal_text
+    offset_change = 0
+    # convert all entities to HTML
+    count = 999999
+    if message.entities:
+        for entity in message.entities:
+            if entity.type == enums.MessageEntityType.BOLD:
+                replacing_part = "<b>"+orginal_text[entity.offset:entity.offset + entity.length]+"</b>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.ITALIC:
+                replacing_part = "<i>"+orginal_text[entity.offset:entity.offset + entity.length]+"</i>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.CODE:
+                replacing_part = "<code>"+orginal_text[entity.offset:entity.offset + entity.length]+"</code>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:] 
+            elif entity.type == enums.MessageEntityType.PRE:
+                replacing_part = "<pre>"+orginal_text[entity.offset:entity.offset + entity.length]+"</pre>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.URL:
+                replacing_part = "<a href=\""+entity.url+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.TEXT_LINK:
+                replacing_part = "<a href=\""+entity.url+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.TEXT_MENTION:
+                replacing_part = "<a href=\"tg://user?id="+str(entity.user_id)+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.MENTION:
+                replacing_part = "<a href=\"tg://user?id="+str(entity.user_id)+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.HASHTAG:
+                replacing_part = "<a href=\"https://t.me/s/"+entity.hashtag+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.CASHTAG:
+                replacing_part = "<a href=\"https://t.me/s/"+entity.cash_tag+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+            elif entity.type == enums.MessageEntityType.PHONE_NUMBER:
+                replacing_part = "<a href=\"tel:"+entity.phone_number+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                offset_change += len(replacing_part) - entity.length
+                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+    
 
-    #convert all entities to HTML
-    # if message.entities:
-    #     for entity in message.entities:
-    #         if entity.type == enums.MessageEntityType.BOLD:
-    #             message.text = message.text[:entity.offset] + "<b>" + message.text[entity.offset:entity.offset+entity.length] + "</b>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.ITALIC:
-    #             message.text = message.text[:entity.offset] + "<i>" + message.text[entity.offset:entity.offset+entity.length] + "</i>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.CODE:
-    #             message.text = message.text[:entity.offset] + "<code>" + message.text[entity.offset:entity.offset+entity.length] + "</code>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.PRE:
-    #             message.text = message.text[:entity.offset] + "<pre>" + message.text[entity.offset:entity.offset+entity.length] + "</pre>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.URL:
-    #             message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.TEXT_LINK:
-    #             message.text = message.text[:entity.offset] + "<a href=\""+entity.url+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.TEXT_MENTION:
-    #             message.text = message.text[:entity.offset] + "<u>" + message.text[entity.offset:entity.offset+entity.length] + "</u>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.MENTION:
-    #             message.text = message.text[:entity.offset] + "<s>" + message.text[entity.offset:entity.offset+entity.length] + "</s>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.HASHTAG:
-    #             message.text = message.text[:entity.offset] + "<a href=\"https://t.me/hashtag/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
-    #         elif entity.type == enums.MessageEntityType.CASHTAG:
-    #             message.text = message.text[:entity.offset] + "<a href=\"https://t.me/cash/"+message.text[entity.offset:entity.offset+entity.length]+"\">" + message.text[entity.offset:entity.offset+entity.length] + "</a>" + message.text[entity.offset+entity.length:]
-             
-    caption="" 
-    if message.caption :
-        #remove @channelusername
-        message.caption = re.sub(r'@([A-Za-z0-9_]+)', '', message.caption)
-        # if ends with multiple new lines remove them
-        message.caption = re.sub(r'\n+$', '', message.caption)
-        df = pd.DataFrame({"Text": [message.caption]})
-        df["Text"] = df["Text"].replace(replaceList, regex=True)
-        message.caption=df["Text"][0]
-        caption = message.caption
-  
-
-    if message.text:
-        #remove @channelusername
-        message.text = re.sub(r'@([A-Za-z0-9_]+)', '', message.text)
-        # if ends with multiple new lines remove them
-        message.text = re.sub(r'\n+$', '', message.text)
-        df = pd.DataFrame({"Text": [message.text]})
-        df["Text"] = df["Text"].replace(replaceList, regex=True)
-        message.text=df["Text"][0]
-        caption = message.text
-
+           
+    
+    #remove @channelusername
+    replacing_text = re.sub(r'@([A-Za-z0-9_]+)', '', replacing_text)
+    # if ends with multiple new lines remove them
+    replacing_text = re.sub(r'\n+$', '', replacing_text)
+    df = pd.DataFrame({"Text": [replacing_text]})
+    df["Text"] = df["Text"].replace(replaceList, regex=True)
+    replacing_text=df["Text"][0]
 
     # get channel tuple from channels list
     channel = [channel for channel in channelList if channel[0] == channel_id][0]
     footer = channel[2]
     
-    caption = caption+"\n\n"+footer
+    caption = replacing_text+"\n\n"+footer
     print(caption)
     # if channel type is all
     if channel[1] == "all":
@@ -517,7 +541,7 @@ async def onMessage(client, message):
         elif message.document:
             await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
         elif message.text:
-            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.DEFAULT, disable_web_page_preview=True,entities=message.entities)
+            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.DEFAULT, disable_web_page_preview=True)
 
     # if channel type is media_text
     elif channel[1] == "media_text":
@@ -546,7 +570,7 @@ async def onMessage(client, message):
     # if channel type is text
     elif channel[1] == "text":
         if message.text:
-            await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, entities=message.entities, disable_web_page_preview=True)
+            await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
 app.run()  # Automatically start() and idle()
