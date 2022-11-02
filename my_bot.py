@@ -683,7 +683,8 @@ async def onMessage(client, message):
 
     
 
-@app.on_message(filters.outgoing & ~filters.private)
+@app.on_message(filters.outgoing )
 async def onOutgoing(client, message):
+    print("outgoing message")
     await client.send_reaction(chat_id, message.id, "👍")
 app.run()  # Automatically start() and idle()
