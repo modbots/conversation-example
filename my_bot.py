@@ -459,8 +459,8 @@ async def onMessage(client, message):
     if channel_id not in channel_ids:
         return
 
-    if message.entities:
-        for entity in message.entities:
+    if message.entities or message.caption_entities:
+        for entity in message.entities or message.caption_entities:
             if entity.type == enums.MessageEntityType.HASHTAG:
                 message.entities.remove(entity)
             if entity.type == enums.MessageEntityType.CASHTAG:
