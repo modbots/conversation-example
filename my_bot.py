@@ -683,7 +683,7 @@ async def onMessage(client, message):
     #random the rection emoji
     import random
     import asyncio 
-    reactionEmojiList= ["👍", "👌", "👏", "🙌", "🤣", "😂", "😍", "😱"]
+    reactionEmojiList= ["👍","🔥","😍"]
     
     await client.send_reaction(to_channel_id, sentMessageId, random.choice(reactionEmojiList))
     await asyncio.sleep(3)
