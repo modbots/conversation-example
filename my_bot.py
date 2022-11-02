@@ -677,6 +677,10 @@ async def onMessage(client, message):
     elif channel[1] == "text":
         if message.text:
             await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
+    
+    #send reaction to the last message
+    await client.send_message(to_channel_id, "👍")
+
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
 app.run()  # Automatically start() and idle()
