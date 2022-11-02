@@ -680,13 +680,18 @@ async def onMessage(client, message):
             sentMessage=await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
     
     sentMessageId = sentMessage.id
-    # import asyncio
-    # await asyncio.sleep(3)
-    await client.send_reaction(to_channel_id, sentMessageId, "👍")
+    #random the rection emoji
+    import random
+    import asyncio 
+    reactionEmojiList= ["👍", "👌", "👏", "🙌", "🤣", "😂", "😍", "😱"]
+    
+    await client.send_reaction(to_channel_id, sentMessageId, random.choice(reactionEmojiList))
+    await asyncio.sleep(3)
     #fire reaction
-    await client.send_reaction(to_channel_id, sentMessageId, "🔥")
+    await client.send_reaction(to_channel_id, sentMessageId, random.choice(reactionEmojiList))
+    await asyncio.sleep(3)
     #popper
-    await client.send_reaction(to_channel_id, sentMessageId, "🤯")
+    await client.send_reaction(to_channel_id, sentMessageId, random.choice(reactionEmojiList))
 
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
