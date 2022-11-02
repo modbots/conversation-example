@@ -613,6 +613,15 @@ async def onMessage(client, message):
                     replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
                     replacing_part = "<code>"+replacing_part+"</code>"
                     entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.CUSTOM_EMOJI:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<emoji id='"+str(entity.custom_emoji_id)+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</emoji>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<emoji id='"+str(entity.custom_emoji_id)+"'>"+replacing_part+"</emoji>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
 
     print(entity_html_dict)
     
