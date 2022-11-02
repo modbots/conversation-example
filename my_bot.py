@@ -450,7 +450,7 @@ async def listreps(client, message):
 async def onOutgoing(client, message):
     print("outgoing message")
     await client.send_reaction(chat_id, message.id, "👍")
-    
+
 @app.on_message(filters.incoming & ~filters.private & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
     # add reaction to the sent message
@@ -651,7 +651,8 @@ async def onMessage(client, message):
         elif message.document:
             await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
         elif message.text:
-            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
+            message=await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
+            print(message)
 
     # if channel type is media_text
     elif channel[1] == "media_text":
