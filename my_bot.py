@@ -376,6 +376,7 @@ async def addrep(client, message):
 
         add_replace(wordList[0], wordList[1])
         await app.send_message(chat_id, "✅Replacement added successfully")
+        global replaceList
         replaceList =get_replacements()
 
 # delete replacement
@@ -420,6 +421,7 @@ async def delrep(client, message):
                     replacement = replacements[index-1][0]
                     delete_replace(replacement)
                     await app.send_message(chat_id, "✅Replacement "+replacement+" deleted successfully")
+                    global replaceList
                     replaceList = get_replacements()
             return
 
