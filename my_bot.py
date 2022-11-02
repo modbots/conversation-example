@@ -449,7 +449,7 @@ async def listreps(client, message):
 
 
 
-@app.on_message(filters.incoming & ~filters.private & ~filters.forwarded & ~filters.poll)
+@app.on_message(~filters.private & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
     # add reaction to the sent message
     await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
