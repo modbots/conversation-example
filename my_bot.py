@@ -679,7 +679,8 @@ async def onMessage(client, message):
             await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
     
     #send reaction to the last message
-    await client.send_message(to_channel_id, "👍")
+    last_message = await client.get_messages(to_channel_id, limit=1)
+    await client.send_reaction(chat_id, last_message.id, "👍")
 
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
