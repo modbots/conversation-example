@@ -678,10 +678,12 @@ async def onMessage(client, message):
         if message.text:
             await client.send_message(to_channel_id, text, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
     
-    #send reaction to the last message
-    last_message = await client.get_messages(to_channel_id, limit=1)
-    await client.send_reaction(chat_id, last_message.id, "👍")
-
+    
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
+    
+
+@app.on_message(filters.outgoing & ~filters.private)
+async def onOutgoing(client, message):
+    await client.send_reaction(chat_id, message.id, "👍")
 app.run()  # Automatically start() and idle()
