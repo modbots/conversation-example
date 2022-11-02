@@ -150,5 +150,3 @@ def get_replacements():
         replacements[row[0]] = row[1]
     cur.close()
     return replacements
-
-print(get_channels())
