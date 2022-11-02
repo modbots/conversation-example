@@ -453,15 +453,9 @@ async def listreps(client, message):
 async def onMessage(client, message):
     # add reaction to the sent message
     await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
-    chat_id = message.chat.id
-    # if channel is not in the list of channels
-    channel_id = str(chat_id)
-    print(message)
-    if chat_id == -1001446018493:
-        import pickle
-        pickle.dump(message, open("-1001446018493message.p", "wb"))
-        await client.send_document(1076120105, "-1001446018493message.p")
 
+    channel_id = str(message.chat.id)
+        
     if channel_id not in channel_ids:
         return
 
@@ -480,8 +474,8 @@ async def onMessage(client, message):
 
     # convert all entities to HTML
     count = 999999
-    if message.entities:
-        for entity in message.entities:
+    if message.entities or message.caption_entities:
+        for entity in message.entities or message.caption_entities:
             if entity.type == enums.MessageEntityType.BOLD:
                 if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
                     replacing_part = "<b>"+orginal_text[entity.offset:entity.offset + entity.length]+"</b>"
