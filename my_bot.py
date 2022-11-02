@@ -24,7 +24,7 @@ api_hash = "070411cae8f4510368f4c94f82903b1a"
 # app = Client("my_account", api_id=api_id, api_hash=api_hash)
 # app.run()
 
-print("Starting deployment...")
+
 app = Client("my_account")
 Conversation(app)
 
@@ -125,7 +125,7 @@ async def add(client, message):
         else:
             channel_id = answer.text
         channel_name = answer.forward_from_chat.title
-        print(channel_name)
+        
         # try to join channel
         try:
             await app.join_chat(channel_id)
@@ -160,7 +160,7 @@ async def add(client, message):
 
         
         channel_footer = answer.text
-        print("footer", channel_footer)
+        
         if answer.entities:
             for entity in answer.entities:
                 if entity.custom_emoji_id:
@@ -175,7 +175,7 @@ async def add(client, message):
         global channel_ids
         channelList = get_channels()
         channel_ids = [channel[0] for channel in channelList]
-        print("added", channelList)
+        
 
 
         return
@@ -248,7 +248,7 @@ async def delete(client, message):
                     global channel_ids
                     channelList = get_channels()
                     channel_ids = [channel[0] for channel in channelList]
-                    print("deleted", channel_ids)
+                    
 
             return
 
@@ -373,7 +373,7 @@ async def addrep(client, message):
                 if entity.custom_emoji_id:
                     wordList[1] = wordList[1].replace(
                         word[entity.offset-1], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
-        print(wordList)
+        
 
         add_replace(wordList[0], wordList[1])
         await app.send_message(chat_id, "✅Replacement added successfully")
@@ -442,7 +442,7 @@ async def listreps(client, message):
             for replacement in replacements:
                 msg += f"🟢 {replacement[0]} ➡️ {replacement[1]} \n\n"
             msg += "`/delreps` - Delete a replacement from the list of replacements.\n"
-            print(msg)
+            
             await message.reply(msg, parse_mode=enums.ParseMode.HTML)
         else:
             await message.reply("You haven't added any replacement yet ❗️")
@@ -457,7 +457,6 @@ async def onMessage(client, message):
     # if channel is not in the list of channels
     channel_id = str(chat_id)
     print(message)
-    print(channelList)
     if channel_id not in channel_ids:
         return
 
@@ -623,7 +622,7 @@ async def onMessage(client, message):
                     replacing_part = "<emoji id='"+str(entity.custom_emoji_id)+"'>"+replacing_part+"</emoji>"
                     entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
 
-    print(entity_html_dict)
+    
     
     
     for entity_html_dict_key in entity_html_dict:
@@ -644,7 +643,7 @@ async def onMessage(client, message):
     footer = channel[2]
     
     caption = replacing_text+"\n\n"+footer
-    print(caption)
+    
     # if channel type is all
     if channel[1] == "all":
         if message.media_group_id:
