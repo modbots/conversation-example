@@ -683,6 +683,11 @@ async def onMessage(client, message):
     # import asyncio
     # await asyncio.sleep(3)
     await client.send_reaction(to_channel_id, sentMessageId, "👍")
+    #fire reaction
+    await client.send_reaction(to_channel_id, sentMessageId, "🔥")
+    #popper
+    await client.send_reaction(to_channel_id, sentMessageId, "🤯")
+
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
     
