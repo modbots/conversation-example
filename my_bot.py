@@ -456,7 +456,7 @@ async def onMessage(client, message):
     chat_id = message.chat.id
     # if channel is not in the list of channels
     channel_id = str(chat_id)
-    print(channel_ids)
+    print(message)
     print(channelList)
     if channel_id not in channel_ids:
         return
@@ -692,6 +692,7 @@ async def onMessage(client, message):
     sentMessageId = sentMessage.id
     #random the rection emoji
     reactionEmojiList= ["👍","🔥","😍","🤯","🎉","👏","😂"]
+    
     await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
