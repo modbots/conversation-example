@@ -10,7 +10,8 @@ import re
 from convopyro import Conversation
 from convopyro import listen_message
 import pandas as pd
-from random import randint
+from random import choice as rand_choice
+
 
 def random_with_N_digits(n):
     range_start = 10**(n-1)
@@ -681,18 +682,8 @@ async def onMessage(client, message):
     
     sentMessageId = sentMessage.id
     #random the rection emoji
-    import random
-    import asyncio 
-    reactionEmojiList= ["👍","🔥","😍"]
-    
-    await client.send_reaction(to_channel_id, sentMessageId, random.choice(reactionEmojiList))
-    await asyncio.sleep(3)
-    #fire reaction
-    await client.send_reaction(to_channel_id, sentMessageId, random.choice(reactionEmojiList))
-    await asyncio.sleep(3)
-    #popper
-    await client.send_reaction(to_channel_id, sentMessageId, random.choice(reactionEmojiList))
-
+    reactionEmojiList= ["👍","🔥","😍","🤯,"🎉","👏","😂"]
+    await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
     
