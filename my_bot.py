@@ -682,7 +682,7 @@ async def onMessage(client, message):
     
     sentMessageId = sentMessage.id
     #random the rection emoji
-    reactionEmojiList= ["👍","🔥","😍","🤯,"🎉","👏","😂"]
+    reactionEmojiList= ["👍","🔥","😍","🤯","🎉","👏","😂"]
     await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
     await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
