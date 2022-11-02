@@ -446,7 +446,11 @@ async def listreps(client, message):
         else:
             await message.reply("You haven't added any replacement yet ❗️")
 
-
+@app.on_message(filters.outgoing )
+async def onOutgoing(client, message):
+    print("outgoing message")
+    await client.send_reaction(chat_id, message.id, "👍")
+    
 @app.on_message(filters.incoming & ~filters.private & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
     # add reaction to the sent message
@@ -683,8 +687,5 @@ async def onMessage(client, message):
 
     
 
-@app.on_message(filters.outgoing )
-async def onOutgoing(client, message):
-    print("outgoing message")
-    await client.send_reaction(chat_id, message.id, "👍")
+
 app.run()  # Automatically start() and idle()
