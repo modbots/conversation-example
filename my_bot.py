@@ -164,14 +164,18 @@ async def add(client, message):
             for entity in answer.entities:
                 if entity.custom_emoji_id:
                     channel_footer = channel_footer.replace(
-                        channel_footer[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
-                    print("offset "+entity.offset)
+                        answer.text[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+                    
 
         add_channel(str(channel_id), channel_type,
                     channel_footer, channel_name)
         await app.send_message(chat_id, "✅Channel added successfully  \nuse  `/list` to see the list of channels")
+        global channelList
+        global channel_ids
         channelList = get_channels()
         channel_ids = [channel[0] for channel in channelList]
+        print("added", channelList)
+
 
         return
         # await message.reply_text("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
@@ -239,8 +243,11 @@ async def delete(client, message):
                     # leave channel
                     await app.leave_chat(channel_id, delete=True)
                     await app.send_message(chat_id, "✅Channel "+channel_id+" deleted successfully")
+                    global channelList
+                    global channel_ids
                     channelList = get_channels()
                     channel_ids = [channel[0] for channel in channelList]
+                    print("deleted", channel_ids)
 
             return
 
@@ -443,10 +450,10 @@ async def onMessage(client, message):
     # add reaction to the sent message
     await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
     chat_id = message.chat.id
-    import pickle
-    pickle.dump(message, open(f"{chat_id}message.p", "wb"))
     # if channel is not in the list of channels
     channel_id = str(chat_id)
+    print(channel_ids)
+    print(channelList)
     if channel_id not in channel_ids:
         return
 
@@ -462,58 +469,155 @@ async def onMessage(client, message):
     entity_html_dict = {}
     replacing_text = orginal_text
     offset_change = 0
+
     # convert all entities to HTML
     count = 999999
     if message.entities:
         for entity in message.entities:
             if entity.type == enums.MessageEntityType.BOLD:
-                replacing_part = "<b>"+orginal_text[entity.offset:entity.offset + entity.length]+"</b>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-            elif entity.type == enums.MessageEntityType.ITALIC:
-                replacing_part = "<i>"+orginal_text[entity.offset:entity.offset + entity.length]+"</i>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-            elif entity.type == enums.MessageEntityType.CODE:
-                replacing_part = "<code>"+orginal_text[entity.offset:entity.offset + entity.length]+"</code>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:] 
-            elif entity.type == enums.MessageEntityType.PRE:
-                replacing_part = "<pre>"+orginal_text[entity.offset:entity.offset + entity.length]+"</pre>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-            elif entity.type == enums.MessageEntityType.URL:
-                replacing_part = "<a href=\""+entity.url+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<b>"+orginal_text[entity.offset:entity.offset + entity.length]+"</b>"
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<b>"+replacing_part+"</b>"
+                entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+                
+            
             elif entity.type == enums.MessageEntityType.TEXT_LINK:
-                replacing_part = "<a href=\""+entity.url+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<a href='"+entity.url+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<a href='"+entity.url+"'>"+replacing_part+"</a>"
+                entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
             elif entity.type == enums.MessageEntityType.TEXT_MENTION:
-                replacing_part = "<a href=\"tg://user?id="+str(entity.user_id)+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-            elif entity.type == enums.MessageEntityType.MENTION:
-                replacing_part = "<a href=\"tg://user?id="+str(entity.user_id)+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-            elif entity.type == enums.MessageEntityType.HASHTAG:
-                replacing_part = "<a href=\"https://t.me/s/"+entity.hashtag+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-            elif entity.type == enums.MessageEntityType.CASHTAG:
-                replacing_part = "<a href=\"https://t.me/s/"+entity.cash_tag+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-            elif entity.type == enums.MessageEntityType.PHONE_NUMBER:
-                replacing_part = "<a href=\"tel:"+entity.phone_number+"\">"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
-                offset_change += len(replacing_part) - entity.length
-                replacing_text = replacing_text[:entity.offset+offset_change] + replacing_part + replacing_text[entity.offset+offset_change+entity.length:]
-    
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<a href='tg://user?id="+str(entity.user_id)+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<a href='tg://user?id="+str(entity.user_id)+"'>"+replacing_part+"</a>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.ITALIC:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<i>"+orginal_text[entity.offset:entity.offset + entity.length]+"</i>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<i>"+replacing_part+"</i>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.CODE:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<code>"+orginal_text[entity.offset:entity.offset + entity.length]+"</code>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<code>"+replacing_part+"</code>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.PRE:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<pre>"+orginal_text[entity.offset:entity.offset + entity.length]+"</pre>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<pre>"+replacing_part+"</pre>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.UNDERLINE:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<u>"+orginal_text[entity.offset:entity.offset + entity.length]+"</u>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<u>"+replacing_part+"</u>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
 
-           
+            elif entity.type == enums.MessageEntityType.STRIKETHROUGH:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<s>"+orginal_text[entity.offset:entity.offset + entity.length]+"</s>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<s>"+replacing_part+"</s>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.BOT_COMMAND:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<code>"+orginal_text[entity.offset:entity.offset + entity.length]+"</code>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<code>"+replacing_part+"</code>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            
+            
+            elif entity.type == enums.MessageEntityType.URL:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<a href='"+orginal_text[entity.offset:entity.offset + entity.length]+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<a href='"+orginal_text[entity.offset:entity.offset + entity.length]+"'>"+replacing_part+"</a>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+
+            elif entity.type == enums.MessageEntityType.EMAIL:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<a href='mailto:"+orginal_text[entity.offset:entity.offset + entity.length]+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<a href='mailto:"+orginal_text[entity.offset:entity.offset + entity.length]+"'>"+replacing_part+"</a>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+
+            elif entity.type == enums.MessageEntityType.PHONE_NUMBER:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<a href='tel:"+orginal_text[entity.offset:entity.offset + entity.length]+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<a href='tel:"+orginal_text[entity.offset:entity.offset + entity.length]+"'>"+replacing_part+"</a>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.SPOILER:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<code>"+orginal_text[entity.offset:entity.offset + entity.length]+"</code>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<code>"+replacing_part+"</code>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.BLOCKQUOTE:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<blockquote>"+orginal_text[entity.offset:entity.offset + entity.length]+"</blockquote>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<blockquote>"+replacing_part+"</blockquote>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+            
+            elif entity.type == enums.MessageEntityType.BANK_CARD:
+                if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
+                    replacing_part = "<code>"+orginal_text[entity.offset:entity.offset + entity.length]+"</code>"
+                    entity_html_dict={f"{entity.offset}:{entity.offset + entity.length}":replacing_part}
+                else:
+                    replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
+                    replacing_part = "<code>"+replacing_part+"</code>"
+                    entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
+
+    print(entity_html_dict)
     
+    
+    for entity_html_dict_key in entity_html_dict:
+        start = int(entity_html_dict_key.split(":")[0])
+        end = int(entity_html_dict_key.split(":")[1])
+        replacing_text = replacing_text.replace(orginal_text[start:end],entity_html_dict[entity_html_dict_key])
+        
     #remove @channelusername
     replacing_text = re.sub(r'@([A-Za-z0-9_]+)', '', replacing_text)
     # if ends with multiple new lines remove them
@@ -541,7 +645,7 @@ async def onMessage(client, message):
         elif message.document:
             await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
         elif message.text:
-            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.DEFAULT, disable_web_page_preview=True)
+            await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
 
     # if channel type is media_text
     elif channel[1] == "media_text":
