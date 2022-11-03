@@ -165,7 +165,7 @@ async def add(client, message):
             for entity in answer.entities:
                 if entity.custom_emoji_id:
                     channel_footer = channel_footer.replace(
-                        answer.text[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+                        answer.text[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>{answer.text[entity.offset:entity.offset+entity.length]}</emoji>")
                     
 
         add_channel(str(channel_id), channel_type,
@@ -346,7 +346,7 @@ async def addrep(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
 
-        await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : 😲=<emoji id='5381855971943389791'>🔥</emoji>", parse_mode=enums.ParseMode.HTML)
+        await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : 😲=<emoji id='5381855971943389791'>😲</emoji>", parse_mode=enums.ParseMode.HTML)
         answer = await listen_message(client, chat_id, timeout=None)
 
         if answer.text == "/cancel":
@@ -372,7 +372,7 @@ async def addrep(client, message):
             for entity in answer.entities:
                 if entity.custom_emoji_id:
                     wordList[1] = wordList[1].replace(
-                        word[entity.offset-1], f"<emoji id='{entity.custom_emoji_id}'>🔥</emoji>")
+                        word[entity.offset-1], f"<emoji id='{entity.custom_emoji_id}'>{word[entity.offset-1]}</emoji>")
         
 
         add_replace(wordList[0], wordList[1])
@@ -484,7 +484,6 @@ async def onMessage(client, message):
                     replacing_part = "<b>"+replacing_part+"</b>"
                 entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
                 
-            
             elif entity.type == enums.MessageEntityType.TEXT_LINK:
                 if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
                     replacing_part = "<a href='"+entity.url+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
@@ -555,9 +554,7 @@ async def onMessage(client, message):
                     replacing_part = entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}"]
                     replacing_part = "<code>"+replacing_part+"</code>"
                     entity_html_dict[f"{entity.offset}:{entity.offset + entity.length}" ] = replacing_part
-            
-            
-            
+                        
             elif entity.type == enums.MessageEntityType.URL:
                 if f"{entity.offset}:{entity.offset + entity.length}" not in entity_html_dict:
                     replacing_part = "<a href='"+orginal_text[entity.offset:entity.offset + entity.length]+"'>"+orginal_text[entity.offset:entity.offset + entity.length]+"</a>"
