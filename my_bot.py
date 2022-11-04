@@ -375,9 +375,8 @@ async def addrep(client, message):
             if message.entities:
                 for entity in message.entities:
                     if entity.custom_emoji_id:
-                        entity.offset=entity.offset-8
                         wordList[1] = wordList[1].replace(
-                            word[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>{word[entity.offset:entity.offset+entity.length]}</emoji>")
+                            message.text[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>{message.text[entity.offset:entity.offset+entity.length]}</emoji>")
         
             print( wordList[1])
             add_replace(wordList[0], wordList[1])
