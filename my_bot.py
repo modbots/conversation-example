@@ -11,7 +11,6 @@ from convopyro import Conversation
 from convopyro import listen_message
 import pandas as pd
 from random import choice as rand_choice
-import pickle
 
 def random_with_N_digits(n):
     range_start = 10**(n-1)
@@ -455,7 +454,9 @@ async def onMessage(client, message):
     await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
 
     channel_id = str(message.chat.id)
-    pickle.dump(message, open("message.pickle", "wb"))
+    # import pickle
+
+    # pickle.dump(message, open("message.pickle", "wb"))
 
     if channel_id not in channel_ids:
         return
