@@ -372,9 +372,16 @@ async def addrep(client, message):
             else:
                 await app.send_message(chat_id, "Invalid format ❗️")
                 return
+            print(wordList)
             
+            if message.entities:
+                for entity in message.entities:
+                    if entity.custom_emoji_id:
+                        wordList[1] = wordList[1].replace(
+                            word[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>{word[entity.offset:entity.offset+entity.length]}</emoji>")
+        
+            print( wordList[1])
             add_replace(wordList[0], wordList[1])
-
             await app.send_message(chat_id, "✅Replacement added successfully")
             global replaceList
             replacements = get_replacements()
