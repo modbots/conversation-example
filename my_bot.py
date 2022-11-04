@@ -630,7 +630,7 @@ async def onMessage(client, message):
         replace_text=entity_html_dict_value[0]
         before_text=entity_html_dict_value[1]
         replacing_part=entity_html_dict_value[2]
-        replacingText= replacingText.replace(before_text,before_text.replace(replacing_part,replace_text)) 
+        replacing_text= replacing_text.replace(before_text,before_text.replace(replacing_part,replace_text)) 
         
     #remove @channelusername
     replacing_text = re.sub(r'@([A-Za-z0-9_]+)', '', replacing_text)
