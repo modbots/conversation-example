@@ -261,6 +261,21 @@ async def delete(client, message):
 async def addword(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
+        #if is in format /addword hi list;word2;word3
+        #remove before first space
+        if " " in message.text:
+            message.text = message.text.split(" ", 1)[1]
+            #then split by ; ignore last one
+            words = message.text.split(";", -1)
+            for word in words:
+                add_word(word)
+            await message.reply("✅Word(s) added successfully")
+            global wordList
+            wordList = get_words()
+            return
+
+
+
         await app.send_message(chat_id, "Please send the word you want to add to the blacklist")
         answer = await listen_message(client, chat_id, timeout=None)
         if answer.text == "/cancel":
@@ -344,6 +359,26 @@ async def listwords(client, message):
 async def addrep(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
+        #if is in format /addrep word1=word2
+        print(message.text)
+        if " " in message.text:
+            word = message.text.split(" ", 1)[1]
+            if "|" in word:
+                wordList = word.split("|")
+            elif ":" in word:
+                wordList = word.split(":")
+            elif "=" in word:
+                wordList = word.split("=")
+            else:
+                await app.send_message(chat_id, "Invalid format ❗️")
+                return
+            
+            add_replace(wordList[0], wordList[1])
+
+            await app.send_message(chat_id, "✅Replacement added successfully")
+            global replaceList
+            replacements = get_replacements()
+            return
 
         await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : 😲=<emoji id='5381855971943389791'>😲</emoji>", parse_mode=enums.ParseMode.HTML)
         answer = await listen_message(client, chat_id, timeout=None)
