@@ -382,7 +382,7 @@ async def addrep(client, message):
             add_replace(wordList[0], wordList[1])
             await app.send_message(chat_id, "✅Replacement added successfully")
             global replaceList
-            replacements = get_replacements()
+            replaceList =get_replacements()
             return
 
         await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : 😲=<emoji id='5381855971943389791'>😲</emoji>", parse_mode=enums.ParseMode.HTML)
