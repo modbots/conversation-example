@@ -360,7 +360,6 @@ async def addrep(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
         #if is in format /addrep word1=word2
-        print(message.text)
         if " " in message.text:
             word = message.text.split(" ", 1)[1]
             if "|" in word:
@@ -372,11 +371,11 @@ async def addrep(client, message):
             else:
                 await app.send_message(chat_id, "Invalid format ❗️")
                 return
-            print(wordList)
             
             if message.entities:
                 for entity in message.entities:
                     if entity.custom_emoji_id:
+                        print(wordList[1])
                         wordList[1] = wordList[1].replace(
                             word[entity.offset:entity.offset+entity.length], f"<emoji id='{entity.custom_emoji_id}'>{word[entity.offset:entity.offset+entity.length]}</emoji>")
         
