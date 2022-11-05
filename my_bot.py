@@ -503,7 +503,7 @@ async def onMessage(client, message):
     if channel_id not in channel_ids:
         return
     orginal_text = message.text or message.caption or ""
-    if is_english(orginal_text) or is_in_blacklist(orginal_text):
+    if not is_english(orginal_text) or is_in_blacklist(orginal_text):
         return
     entities=message.entities or message.caption_entities
     if entities:
