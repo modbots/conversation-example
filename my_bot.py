@@ -70,6 +70,7 @@ def is_english(text):
 
 def is_in_blacklist(text):
     # check words
+    global wordBlacklist
     if wordBlacklist:
         for word in wordBlacklist:
             if word[0] in text:
@@ -261,6 +262,7 @@ async def delete(client, message):
 async def addword(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
+        global wordBlacklist
         #if is in format /addword hi list;word2;word3
         #remove before first space
         if " " in message.text:
@@ -284,7 +286,7 @@ async def addword(client, message):
         word = answer.text
         add_word(word)
         await app.send_message(chat_id, "✅Word added successfully")
-        words = get_words()
+        wordBlacklist = get_words()
 
 # delete words from blacklist
 
@@ -294,6 +296,7 @@ async def delword(client, message):
 
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
+        global wordBlacklist
         words = get_words()
         if words:
             msg = "Here is the list of words you have added : \n"
@@ -329,7 +332,7 @@ async def delword(client, message):
                     word = words[index-1][0]
                     delete_word(word)
                     await app.send_message(chat_id, "✅Word "+word+" deleted successfully")
-                    words = get_words()
+                    wordBlacklist = get_words()
             return
 
         else:
@@ -499,6 +502,9 @@ async def onMessage(client, message):
 
     if channel_id not in channel_ids:
         return
+    orginal_text = message.text or message.caption or ""
+    if is_english(orginal_text) or is_in_blacklist(orginal_text):
+        return
     entities=message.entities or message.caption_entities
     if entities:
         for entity in entities:
@@ -508,7 +514,6 @@ async def onMessage(client, message):
                 entities.remove(entity)
      
     
-    orginal_text = message.text or message.caption or ""
     entity_html_dict = {}
     replacing_text = orginal_text
     offset_change = 0
