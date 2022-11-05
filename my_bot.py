@@ -359,6 +359,7 @@ async def listwords(client, message):
 async def addrep(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
+        global replaceList
         #if is in format /addrep word1=word2
         if " " in message.text:
             word = message.text.split(" ", 1)[1]
@@ -381,8 +382,7 @@ async def addrep(client, message):
             print( wordList[1])
             add_replace(wordList[0], wordList[1])
             await app.send_message(chat_id, "✅Replacement added successfully")
-            global replaceList
-            replaceList =get_replacements()
+            replaceList = get_replacements()
             return
 
         await app.send_message(chat_id, "Please send the word with the replacement you want to add to the list of replacements \nuse `|` or `:` or `=` to separate the word and the replacement \n\nExample : 😲=<emoji id='5381855971943389791'>😲</emoji>", parse_mode=enums.ParseMode.HTML)
@@ -416,7 +416,6 @@ async def addrep(client, message):
 
         add_replace(wordList[0], wordList[1])
         await app.send_message(chat_id, "✅Replacement added successfully")
-        global replaceList
         replaceList =get_replacements()
 
 # delete replacement
