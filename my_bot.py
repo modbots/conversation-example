@@ -485,7 +485,7 @@ async def listreps(client, message):
             await message.reply("You haven't added any replacement yet ❗️")
 
 
-@app.on_message(~filters.private & ~filters.poll)
+@app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
     # add reaction to the sent message
     await client.send_chat_action(to_channel_id1, enums.ChatAction.TYPING)
