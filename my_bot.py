@@ -53,7 +53,7 @@ emoj = re.compile("["
                   u"\ufe0f"  # dingbats
                   u"\u3030"
                   "]+", re.UNICODE)
-to_channel_id = -1001413593587
+to_channel_id = -1001367920373
 
 
 def is_english(text):
