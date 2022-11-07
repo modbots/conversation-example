@@ -746,8 +746,8 @@ async def onMessage(client, message):
     footer1 = footer
     footer2 = footer
     if "<username>" in footer:
-        footer1=footer.replace("<username>", f"@{to_channel_username1}")
-        footer2=footer1.replace("<username>", f"@{to_channel_username2}")
+        footer1=footer1.replace("<username>", to_channel_username1)
+        footer2=footer2.replace("<username>", to_channel_username2)
     caption1 = replacing_text+"\n\n"+footer1
     caption2 = replacing_text+"\n\n"+footer2
 
