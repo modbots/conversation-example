@@ -736,7 +736,7 @@ async def onMessage(client, message):
     replacing_text = re.sub(r'@([A-Za-z0-9_]+)', '', replacing_text)
     # if ends with multiple new lines remove them
     replacing_text = re.sub(r'\n+$|<[A-z]><\/[A-z]>', '', replacing_text)
-    replacing_text = re.sub(r'<[A-z]>\s*<\/[A-z]>', '', replacing_text)
+    replacing_text = re.sub(r'<[A-z]>\s+<\/[A-z]>', ' ', replacing_text)
     df = pd.DataFrame({"Text": [replacing_text]})
     df["Text"] = df["Text"].replace(replaceList, regex=True)
     replacing_text = df["Text"][0]
