@@ -770,8 +770,8 @@ async def onMessage(client, message):
             sentMessage1 = await client.send_document(to_channel_id1, message.document.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
             sentMessage2 = await client.send_document(to_channel_id2, message.document.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
         elif message.text:
-            sentMessage1 = await client.send_message(to_channel_id1, caption1, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
-            sentMessage2 = await client.send_message(to_channel_id2, caption2, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
+            sentMessage1 = await client.send_message(to_channel_id1, caption1, parse_mode=enums.ParseMode.HTML)
+            sentMessage2 = await client.send_message(to_channel_id2, caption2, parse_mode=enums.ParseMode.HTML)
 
     # if channel type is media_text
     elif channel[1] == "media_text":
@@ -810,8 +810,8 @@ async def onMessage(client, message):
     # if channel type is text
     elif channel[1] == "text":
         if message.text:
-            sentMessage1 = await client.send_message(to_channel_id1, caption1, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
-            sentMessage2 = await client.send_message(to_channel_id2, caption2, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
+            sentMessage1 = await client.send_message(to_channel_id1, caption1, parse_mode=enums.ParseMode.HTML)
+            sentMessage2 = await client.send_message(to_channel_id2, caption2, parse_mode=enums.ParseMode.HTML)
 
     sentMessageId1 = sentMessage1.id
     sentMessageId2 = sentMessage2.id
