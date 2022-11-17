@@ -1,6 +1,6 @@
 import os
 import psycopg2
-
+import re
 #if is in heroku
 if "DATABASE_URL" in os.environ:
     DATABASE_URL = os.environ['DATABASE_URL']
@@ -147,6 +147,6 @@ def get_replacements():
     #send as dict
     replacements = {}
     for row in rows:
-        replacements[" "+row[0]] = " "+row[1]
+        replacements[row[0]+" "] = row[1]+" "
     cur.close()
     return replacements

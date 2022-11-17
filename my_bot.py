@@ -521,7 +521,8 @@ async def onMessage(client, message):
             before_entity_text = orginal_text[entity.offset:entity.offset + entity.length]
             before_to_entity = orginal_text[before_offset:entity.offset + entity.length]
             key = f"{entity.offset}:{entity.offset + entity.length}"
-
+            if before_entity_text.strip()=='':
+                continue
             if entity.type == enums.MessageEntityType.BOLD:
                 if key not in entity_html_dict:
                     replacing_part = "<b>" + before_entity_text+"</b>"
