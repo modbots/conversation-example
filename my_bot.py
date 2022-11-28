@@ -311,7 +311,7 @@ async def listwh(client, message):
         if groups:
             newText = "Here is the list of groups you have added : \n\n"
             for group in groups:
-                newText += f"🟢 Group Name : {group['groupName']} \nGroup ID : {group['groupId']} \nInvite Link : {group['inviteLink']} \n\n"
+                newText += f"🟢 Group Name : {group['name']} \nGroup ID : {group['id']} \nInvite Link : {group['inviteLink']} \n\n"
 
             newText += "`/whdelete` - Delete a group from the list of groups to be forwarded.\n"
             await msg.edit(newText)
