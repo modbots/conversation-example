@@ -11,6 +11,7 @@ from convopyro import Conversation
 from convopyro import listen_message
 import pandas as pd
 from random import choice as rand_choice
+import requests
 
 
 def random_with_N_digits(n):
@@ -21,7 +22,7 @@ def random_with_N_digits(n):
 
 api_id = 20369082
 api_hash = "070411cae8f4510368f4c94f82903b1a"
-
+os.environ['NO_PROXY'] = '127.0.0.1'
 # app = Client("my_account", api_id=api_id, api_hash=api_hash)
 # app.run()
 
@@ -183,8 +184,6 @@ async def add(client, message):
         # await message.reply_text("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
 
 # list
-
-
 @app.on_message(filters.command(["list"]))
 async def list(client, message):
     chat_id = message.chat.id
@@ -255,9 +254,117 @@ async def delete(client, message):
         else:
             await message.reply("You haven't added any channel yet !")
 
+# manage whatsapp groups
+
+# create whatsapp group
+@app.on_message(filters.command(["whcr"]))
+async def createwh(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        if " " in message.text:
+            group_name = message.text.split(" ", 1)[1]
+            #create whatsapp group
+            try:
+                response = requests.post('http://127.0.0.1:3000/create/group/', json={
+                                        'groupName': group_name}).json()
+                # response contains group name and group chat link
+                await app.send_message(chat_id, "✅Group created successfully \nGroup Name : "+response['groupName']+"\nGroup ID : "+response['groupId']+"\nInvite Link : "+response['inviteLink'])
+            except:
+                await app.send_message(chat_id, "❌Failed to add group")
+            return
+
+        await app.send_message(chat_id, "Please send the name of the group you want to create")
+        answer = await listen_message(client, chat_id, timeout=None)
+        if answer.text == "/cancel":
+            await app.send_message(chat_id, "Cancelled❎")
+            return
+        group_name = answer.text
+        await app.send_message(chat_id, "Please send the description of the group you want to create")
+        answer = await listen_message(client, chat_id, timeout=None)
+        if answer.text == "/cancel":
+            await app.send_message(chat_id, "Cancelled❎")
+            return
+        group_description = answer.text
+
+        try:
+            response = requests.post('http://127.0.0.1:3000/create/group/', json={
+                                     'groupName': group_name, 'groupDescription': group_description}).json()
+            # response contains group name and group chat link
+            await app.send_message(chat_id, "✅Group created successfully \nGroup Name : "+response['groupName']+"\nGroup ID : "+response['groupId']+"\nInvite Link : "+response['inviteLink'])
+        except:
+            await app.send_message(chat_id, "❌Failed to add group")
+        global groupList
+        global group_ids
+        groupList = get_groups()
+        group_ids = [group[0] for group in groupList]
+
+        return
+
+
+@ app.on_message(filters.command(["whlist"]))
+async def listwh(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        msg = await app.send_message(chat_id, "Please wait...")
+        groups = requests.post('http://127.0.0.1:3000/get/groups/').json()
+        if groups:
+            newText = "Here is the list of groups you have added : \n\n"
+            for group in groups:
+                newText += f"🟢 Group Name : {group['groupName']} \nGroup ID : {group['groupId']} \nInvite Link : {group['inviteLink']} \n\n"
+
+            newText += "`/whdelete` - Delete a group from the list of groups to be forwarded.\n"
+            await msg.edit(newText)
+        else:
+            await message.reply("You haven't added any group yet ❗️")
+
+
+@ app.on_message(filters.command(["whdelete"]))
+async def deletewh(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        #send message to user to please wait
+        msg = await app.send_message(chat_id, "Please wait...")
+        groups = requests.post('http://127.0.0.1:3000/get/groups/').json()
+        if groups:
+            newText = "Here is the list of groups you have added : \n"
+            index = 1
+            for group in groups:
+                newText += f"{index}. Group Name : {group['groupName']} \nGroup ID : {group['groupId']} \nInvite Link : {group['inviteLink']} \n\n"
+                index += 1
+            await msg.edit(newText)
+            await app.send_message(chat_id, "Please send the indexes of the groups you want to delete separated by a space. \nExample : `1 2 3`")
+            answer = await listen_message(client, chat_id, timeout=None)
+            if answer.text == "/cancel":
+                await app.send_message(chat_id, "Cancelled❎")
+                return
+            index = answer.text
+            indexes = index.split(" ")
+
+            # if indexes are not numbers
+            for i in indexes:
+                if not i.isdigit():
+                    await app.send_message(chat_id, "Please send only numbers separated by a space.")
+                    return
+
+            # if indexes are valid
+            if not all(int(i) <= len(groups) for i in indexes):
+                await app.send_message(chat_id, "Invalid indexes ❗️")
+                return
+
+            for index in indexes:
+
+                index = int(index)
+                if index > len(groups):
+                    await app.send_message(chat_id, "Invalid index : "+index)
+                else:
+                    group_id = groups[index-1]['groupId']
+                    try:
+                        requests.post('http://127.0.0.1:3000/delete/group/', json={'groupId': group_id})
+                        await app.send_message(chat_id, "✅Group "+group_id+" deleted successfully")
+                    except:
+                        await app.send_message(chat_id, "❌Failed to delete group")
+
 # add word to blacklist
-
-
 @app.on_message(filters.command(["addword"]))
 async def addword(client, message):
     chat_id = message.chat.id
@@ -287,8 +394,6 @@ async def addword(client, message):
         wordBlacklist = get_words()
 
 # delete words from blacklist
-
-
 @app.on_message(filters.command(["delword"]))
 async def delword(client, message):
 
@@ -337,8 +442,6 @@ async def delword(client, message):
             await message.reply("You haven't added any word yet !")
 
 # list words
-
-
 @app.on_message(filters.command(["listwords"]))
 async def listwords(client, message):
     chat_id = message.chat.id
@@ -354,8 +457,6 @@ async def listwords(client, message):
             await message.reply("You haven't added any word yet ❗️")
 
 # add replacement
-
-
 @app.on_message(filters.command(["addrep"]))
 async def addrep(client, message):
     chat_id = message.chat.id
@@ -521,7 +622,7 @@ async def onMessage(client, message):
             before_entity_text = orginal_text[entity.offset:entity.offset + entity.length]
             before_to_entity = orginal_text[before_offset:entity.offset + entity.length]
             key = f"{entity.offset}:{entity.offset + entity.length}"
-            if before_entity_text.strip()=='':
+            if before_entity_text.strip() == '':
                 continue
             if entity.type == enums.MessageEntityType.BOLD:
                 if key not in entity_html_dict:
@@ -533,7 +634,7 @@ async def onMessage(client, message):
 
             elif entity.type == enums.MessageEntityType.TEXT_LINK:
                 if key not in entity_html_dict:
-                    replacing_part = "<a href='"+entity.url+"'>" +before_entity_text+"</a>"
+                    replacing_part = "<a href='"+entity.url+"'>" + before_entity_text+"</a>"
                 else:
                     replacing_part = "<a href='"+entity.url + \
                         "'>"+entity_html_dict[key][0]+"</a>"
@@ -547,7 +648,8 @@ async def onMessage(client, message):
                         str(entity.user_id)+"'>" + before_entity_text+"</a>"
                 else:
                     replacing_part = "<a href='tg://user?id=" + \
-                        str(entity.user_id)+"'>"+entity_html_dict[key][0]+"</a>"
+                        str(entity.user_id)+"'>" + \
+                        entity_html_dict[key][0]+"</a>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -565,7 +667,8 @@ async def onMessage(client, message):
 
                     replacing_part = "<code>" + before_entity_text+"</code>"
                 else:
-                    replacing_part = "<code>"+entity_html_dict[key][0]+"</code>"
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -601,7 +704,8 @@ async def onMessage(client, message):
 
                     replacing_part = "<code>" + before_entity_text+"</code>"
                 else:
-                    replacing_part = "<code>"+entity_html_dict[key][0]+"</code>"
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -611,7 +715,8 @@ async def onMessage(client, message):
                     replacing_part = "<a href='" + \
                         before_entity_text+"'>" + before_entity_text+"</a>"
                 else:
-                    replacing_part = "<a href='" + before_entity_text+"'>"+entity_html_dict[key][0]+"</a>"
+                    replacing_part = "<a href='" + before_entity_text + \
+                        "'>"+entity_html_dict[key][0]+"</a>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -621,7 +726,8 @@ async def onMessage(client, message):
                     replacing_part = "<a href='mailto:" + \
                         before_entity_text+"'>" + before_entity_text+"</a>"
                 else:
-                    replacing_part = "<a href='mailto:" + before_entity_text+"'>"+entity_html_dict[key][0]+"</a>"
+                    replacing_part = "<a href='mailto:" + before_entity_text + \
+                        "'>"+entity_html_dict[key][0]+"</a>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -631,7 +737,8 @@ async def onMessage(client, message):
                     replacing_part = "<a href='tel:" + \
                         before_entity_text+"'>" + before_entity_text+"</a>"
                 else:
-                    replacing_part = "<a href='tel:" + entity_html_dict[key][0]+"'>"+replacing_part+"</a>"
+                    replacing_part = "<a href='tel:" + \
+                        entity_html_dict[key][0]+"'>"+replacing_part+"</a>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -640,7 +747,8 @@ async def onMessage(client, message):
 
                     replacing_part = "<code>" + before_entity_text+"</code>"
                 else:
-                    replacing_part = "<code>"+entity_html_dict[key][0]+"</code>"
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -649,7 +757,8 @@ async def onMessage(client, message):
 
                     replacing_part = "<blockquote>" + before_entity_text+"</blockquote>"
                 else:
-                    replacing_part = "<blockquote>"+entity_html_dict[key][0]+"</blockquote>"
+                    replacing_part = "<blockquote>" + \
+                        entity_html_dict[key][0]+"</blockquote>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -658,7 +767,8 @@ async def onMessage(client, message):
 
                     replacing_part = "<code>" + before_entity_text+"</code>"
                 else:
-                    replacing_part = "<code>"+entity_html_dict[key][0]+"</code>"
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
                 entity_html_dict[key] = [replacing_part,
                                          before_to_entity, before_entity_text]
 
@@ -666,7 +776,8 @@ async def onMessage(client, message):
                 if key not in entity_html_dict:
 
                     replacing_part = "<emoji id='" + \
-                        str(entity.custom_emoji_id)+"'>" + before_entity_text+"</emoji>"
+                        str(entity.custom_emoji_id)+"'>" + \
+                        before_entity_text+"</emoji>"
                 else:
                     replacing_part = "<emoji id='" + \
                         str(entity.custom_emoji_id) + \
@@ -680,7 +791,7 @@ async def onMessage(client, message):
         start = int(entity_html_dict_key.split(":")[0])
         end = int(entity_html_dict_key.split(":")[1])
         replace_text = entity_html_dict_value[0]
-        #if replace_text is an empty tag, remove it regex
+        # if replace_text is an empty tag, remove it regex
         if re.search("<[A-z]>\s*<\/[A-z]>", replace_text):
             continue
         before_text = entity_html_dict_value[1]
