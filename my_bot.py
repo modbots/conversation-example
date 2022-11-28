@@ -93,7 +93,7 @@ def get_html_emoj(emoji_id):
 async def help(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
-        await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the .😊 \n\n" +
+        await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the CM Nisal.😊 \n\n" +
                                  "**Commands**\n\n" +
                                  " \t\t**Manage Channels**\n" +
                                  "🪛/add - Add a channel to the list of channels to be forwarded.\n" +
@@ -109,6 +109,10 @@ async def help(client, message):
                                  "🪛/addrep - Add a word to the replace list.\n" +
                                  "🪛/delreps - Delete a word from the replace list.\n" +
                                  "🪛/listreps - List all words in the replace list.\n\n" +
+                                 "\t\t**Manage Whatsapp Groups**\n" +
+                                 "🪛/whcr - Creates a whatsapp group.\n" +
+                                 "🪛/whdel - Delete a whatsapp group.\n" +
+                                 "🪛/whlist - List all whatsapp groups.\n" +
                                  "**Note**\n🔸This bot will only forward posts from channels that are in English.\n" +
                                  "🔸This bot will not forward posts that contain words in the blacklist.\n" +
                                  "🔸This bot will replace words in the replace list with the corresponding word in the replace list." +
@@ -185,6 +189,8 @@ async def add(client, message):
         # await message.reply_text("Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
 
 # list
+
+
 @app.on_message(filters.command(["list"]))
 async def list(client, message):
     chat_id = message.chat.id
@@ -258,16 +264,18 @@ async def delete(client, message):
 # manage whatsapp groups
 
 # create whatsapp group
+
+
 @app.on_message(filters.command(["whcr"]))
 async def createwh(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
         if " " in message.text:
             group_name = message.text.split(" ", 1)[1]
-            #create whatsapp group
+            # create whatsapp group
             try:
                 response = requests.post('http://127.0.0.1:3000/create/group/', json={
-                                        'groupName': group_name}).json()
+                    'groupName': group_name}).json()
                 # response contains group name and group chat link
                 await app.send_message(chat_id, "✅Group created successfully \nGroup Name : "+response['groupName']+"\nGroup ID : "+response['groupId']+"\nInvite Link : "+response['inviteLink'])
             except:
@@ -319,18 +327,18 @@ async def listwh(client, message):
             await message.reply("You haven't added any group yet ❗️")
 
 
-@ app.on_message(filters.command(["whdelete"]))
+@ app.on_message(filters.command(["whdel"]))
 async def deletewh(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
-        #send message to user to please wait
+        # send message to user to please wait
         msg = await app.send_message(chat_id, "Please wait...")
         groups = requests.post('http://127.0.0.1:3000/get/groups/').json()
         if groups:
             newText = "Here is the list of groups you have added : \n"
             index = 1
             for group in groups:
-                newText += f"{index}. Group Name : {group['groupName']} \nGroup ID : {group['groupId']} \nInvite Link : {group['inviteLink']} \n\n"
+                newText += f"{index}. Group Name : {group['name']} \nGroup ID : {group['id']} \nInvite Link : {group['inviteLink']} \n\n"
                 index += 1
             await msg.edit(newText)
             await app.send_message(chat_id, "Please send the indexes of the groups you want to delete separated by a space. \nExample : `1 2 3`")
@@ -360,12 +368,15 @@ async def deletewh(client, message):
                 else:
                     group_id = groups[index-1]['groupId']
                     try:
-                        requests.post('http://127.0.0.1:3000/delete/group/', json={'groupId': group_id})
+                        requests.post(
+                            'http://127.0.0.1:3000/delete/group/', json={'groupId': group_id})
                         await app.send_message(chat_id, "✅Group "+group_id+" deleted successfully")
                     except:
                         await app.send_message(chat_id, "❌Failed to delete group")
 
 # add word to blacklist
+
+
 @app.on_message(filters.command(["addword"]))
 async def addword(client, message):
     chat_id = message.chat.id
@@ -395,6 +406,8 @@ async def addword(client, message):
         wordBlacklist = get_words()
 
 # delete words from blacklist
+
+
 @app.on_message(filters.command(["delword"]))
 async def delword(client, message):
 
@@ -443,6 +456,8 @@ async def delword(client, message):
             await message.reply("You haven't added any word yet !")
 
 # list words
+
+
 @app.on_message(filters.command(["listwords"]))
 async def listwords(client, message):
     chat_id = message.chat.id
@@ -458,6 +473,8 @@ async def listwords(client, message):
             await message.reply("You haven't added any word yet ❗️")
 
 # add replacement
+
+
 @app.on_message(filters.command(["addrep"]))
 async def addrep(client, message):
     chat_id = message.chat.id
