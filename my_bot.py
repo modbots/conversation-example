@@ -93,7 +93,7 @@ def get_html_emoj(emoji_id):
 async def help(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
-        await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the CMNisal.😊 \n\n" +
+        await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the CMNisal😊 \n\n" +
                                  "**Commands**\n\n" +
                                  " \t\t**Manage Channels**\n" +
                                  "🪛/add - Add a channel to the list of channels to be forwarded.\n" +
