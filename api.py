@@ -147,6 +147,6 @@ def get_replacements():
     #send as dict
     replacements = {}
     for row in rows:
-        replacements[row[0]+" "] = row[1]+" "
+        replacements[row[0]] = row[1]
     cur.close()
     return replacements

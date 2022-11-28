@@ -93,7 +93,7 @@ def get_html_emoj(emoji_id):
 async def help(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
-        await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the CM Nisal.😊 \n\n" +
+        await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the CMNisal.😊 \n\n" +
                                  "**Commands**\n\n" +
                                  " \t\t**Manage Channels**\n" +
                                  "🪛/add - Add a channel to the list of channels to be forwarded.\n" +
@@ -317,7 +317,7 @@ async def listwh(client, message):
         msg = await app.send_message(chat_id, "Please wait...")
         groups = requests.post('http://127.0.0.1:3000/get/groups/').json()
         if groups:
-            newText = "Here is the list of groups you have added : \n\n"
+            newText = "Here is the list of whatsapp groups you have created : \n\n"
             for group in groups:
                 newText += f"🟢 Group Name : {group['name']} \nGroup ID : {group['id']} \nInvite Link : {group['inviteLink']} \n\n"
 
@@ -335,7 +335,7 @@ async def deletewh(client, message):
         msg = await app.send_message(chat_id, "Please wait...")
         groups = requests.post('http://127.0.0.1:3000/get/groups/').json()
         if groups:
-            newText = "Here is the list of groups you have added : \n"
+            newText = "Here is the list of whatsapp groups you have created : \n"
             index = 1
             for group in groups:
                 newText += f"{index}. Group Name : {group['name']} \nGroup ID : {group['id']} \nInvite Link : {group['inviteLink']} \n\n"
