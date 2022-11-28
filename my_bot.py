@@ -57,10 +57,10 @@ emoj = re.compile("["
                   u"\ufe0f"  # dingbats
                   u"\u3030"
                   "]+", re.UNICODE)
-to_channel_id1 = -1001367920373
-to_channel_id2 = -1001414316119
-to_channel_username1 = "@CMNisal"
-to_channel_username2 = "@CryptoRoomNews"
+
+
+to_channels = {-1001367920373: "@CMNisal", -
+               1001414316119: "@CryptoRoomNews", -1001313534745: "@ApeDiamonds"}
 
 
 def is_english(text):
@@ -607,9 +607,6 @@ async def listreps(client, message):
 
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
-    # add reaction to the sent message
-    await client.send_chat_action(to_channel_id1, enums.ChatAction.TYPING)
-    await client.send_chat_action(to_channel_id2, enums.ChatAction.TYPING)
 
     channel_id = str(message.chat.id)
     # import pickle
@@ -825,89 +822,66 @@ async def onMessage(client, message):
     df = pd.DataFrame({"Text": [replacing_text]})
     df["Text"] = df["Text"].replace(replaceList, regex=True)
     replacing_text = df["Text"][0]
+    reactionEmojiList = ["👍", "🔥", "😍", "🤯", "🎉", "👏"]
 
     # get channel tuple from channels list
     channel = [channel for channel in channelList if channel[0] == channel_id][0]
     footer = channel[2]
-    footer1 = footer
-    footer2 = footer
-    if "<username>" in footer:
-        footer1 = footer1.replace("<username>", to_channel_username1)
-        footer2 = footer2.replace("<username>", to_channel_username2)
-    caption1 = replacing_text+"\n\n"+footer1
-    caption2 = replacing_text+"\n\n"+footer2
+    for to_channel_id, to_channel_username in to_channels.items():
+        await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
 
-    # if channel type is all
-    if channel[1] == "all":
-        if message.media_group_id:
-            sentMessage1 = await client.copy_media_group(to_channel_id1, message.chat.id, message.id, captions=caption1)
-            sentMessage2 = await client.copy_media_group(to_channel_id2, message.chat.id, message.id, captions=caption2)
+        if "<username>" in footer:
+            nFooter = footer.replace("<username>", to_channel_username)
+        caption = replacing_text+"\n\n"+nfooter
+        # if channel type is all
+        if channel[1] == "all":
+            if message.media_group_id:
+                sentMessage = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
 
-        elif message.photo:
-            sentMessage1 = await client.send_photo(to_channel_id1, photo=message.photo.file_id, parse_mode=enums.ParseMode.HTML, caption=caption1)
-            sentMessage2 = await client.send_photo(to_channel_id2, photo=message.photo.file_id, parse_mode=enums.ParseMode.HTML, caption=caption2)
-        elif message.video:
-            sentMessage1 = await client.send_video(to_channel_id1, message.video.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_video(to_channel_id2, message.video.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
-        elif message.audio:
-            sentMessage1 = await client.send_audio(to_channel_id1, message.audio.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_audio(to_channel_id2, message.audio.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
-        elif message.document:
-            sentMessage1 = await client.send_document(to_channel_id1, message.document.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_document(to_channel_id2, message.document.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
-        elif message.text:
-            sentMessage1 = await client.send_message(to_channel_id1, caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_message(to_channel_id2, caption2, parse_mode=enums.ParseMode.HTML)
+            elif message.photo:
+                sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, parse_mode=enums.ParseMode.HTML, caption=caption)
+            elif message.video:
+                sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.audio:
+                sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.document:
+                sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.text:
+                sentMessage1 = await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML)
 
-    # if channel type is media_text
-    elif channel[1] == "media_text":
-        if message.media_group_id:
-            sentMessage1 = await client.copy_media_group(to_channel_id1, message.chat.id, message.id, captions=caption1)
-            sentMessage2 = await client.copy_media_group(to_channel_id2, message.chat.id, message.id, captions=caption2)
-        elif message.photo:
-            sentMessage1 = await client.send_photo(to_channel_id1, photo=message.photo.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_photo(to_channel_id2, photo=message.photo.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
-        elif message.video:
-            sentMessage1 = await client.send_video(to_channel_id1, message.video.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_video(to_channel_id2, message.video.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
-        elif message.audio:
-            sentMessage1 = await client.send_audio(to_channel_id1, message.audio.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_audio(to_channel_id2, message.audio.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
-        elif message.document:
-            sentMessage1 = await client.send_document(to_channel_id1, message.document.file_id, caption=caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_document(to_channel_id2, message.document.file_id, caption=caption2, parse_mode=enums.ParseMode.HTML)
-    # if channel type is media
-    elif channel[1] == "media":
-        if message.media_group_id:
-            sentMessage1 = await client.copy_media_group(to_channel_id1, message.chat.id, message.id, captions=caption1)
-            sentMessage2 = await client.copy_media_group(to_channel_id2, message.chat.id, message.id, captions=caption2)
-        elif message.photo:
-            sentMessage1 = await client.send_photo(to_channel_id1, photo=message.photo.file_id, captions=caption1)
-            sentMessage2 = await client.send_photo(to_channel_id2, photo=message.photo.file_id, captions=caption2)
-        elif message.video:
-            sentMessage1 = await client.send_video(to_channel_id1, message.video.file_id, captions=caption1)
-            sentMessage2 = await client.send_video(to_channel_id2, message.video.file_id, captions=caption2)
-        elif message.audio:
-            sentMessage1 = await client.send_audio(to_channel_id1, message.audio.file_id, captions=caption1)
-            sentMessage2 = await client.send_audio(to_channel_id2, message.audio.file_id, captions=caption2)
-        elif message.document:
-            sentMessage1 = await client.send_document(to_channel_id1, message.document.file_id, captions=caption1)
-            sentMessage2 = await client.send_document(to_channel_id2, message.document.file_id, captions=caption2)
-    # if channel type is text
-    elif channel[1] == "text":
-        if message.text:
-            sentMessage1 = await client.send_message(to_channel_id1, caption1, parse_mode=enums.ParseMode.HTML)
-            sentMessage2 = await client.send_message(to_channel_id2, caption2, parse_mode=enums.ParseMode.HTML)
+        # if channel type is media_text
+        elif channel[1] == "media_text":
+            if message.media_group_id:
+                sentMessage1 = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+            elif message.photo:
+                sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.video:
+                sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.audio:
+                sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.document:
+                sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        # if channel type is media
+        elif channel[1] == "media":
+            if message.media_group_id:
+                sentMessage1 = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+            elif message.photo:
+                sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, captions=caption)
+            elif message.video:
+                sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, captions=caption)
+            elif message.audio:
+                sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, captions=caption)
+            elif message.document:
+                sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, captions=caption)
+        # if channel type is text
+        elif channel[1] == "text":
+            if message.text:
+                sentMessage1 = await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML)
 
-    sentMessageId1 = sentMessage1.id
-    sentMessageId2 = sentMessage2.id
-    # random the rection emoji
-    reactionEmojiList = ["👍", "🔥", "😍", "🤯", "🎉", "👏"]
+        sentMessageId = sentMessage1.id
+        # random the rection emoji
 
-    await client.send_reaction(to_channel_id1, sentMessageId1, rand_choice(reactionEmojiList))
-    await client.send_reaction(to_channel_id2, sentMessageId2, rand_choice(reactionEmojiList))
-    await app.send_chat_action(to_channel_id1, enums.ChatAction.CANCEL)
-    await app.send_chat_action(to_channel_id2, enums.ChatAction.CANCEL)
-
+        await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
+        await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
 app.run()  # Automatically start() and idle()
