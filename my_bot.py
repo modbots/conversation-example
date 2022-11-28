@@ -112,7 +112,7 @@ async def help(client, message):
                                  "\t\t**Manage Whatsapp Groups**\n" +
                                  "🪛/whcr - Creates a whatsapp group.\n" +
                                  "🪛/whdel - Delete a whatsapp group.\n" +
-                                 "🪛/whlist - List all whatsapp groups.\n" +
+                                 "🪛/whlist - List all whatsapp groups.\n\n" +
                                  "**Note**\n🔸This bot will only forward posts from channels that are in English.\n" +
                                  "🔸This bot will not forward posts that contain words in the blacklist.\n" +
                                  "🔸This bot will replace words in the replace list with the corresponding word in the replace list." +
