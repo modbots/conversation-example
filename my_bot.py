@@ -366,7 +366,7 @@ async def deletewh(client, message):
                 if index > len(groups):
                     await app.send_message(chat_id, "Invalid index : "+index)
                 else:
-                    group_id = groups[index-1]['groupId']
+                    group_id = groups[index-1]['id']
                     try:
                         requests.post(
                             'http://127.0.0.1:3000/delete/group/', json={'groupId': group_id})
