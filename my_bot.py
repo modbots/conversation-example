@@ -77,8 +77,8 @@ async def server_status():
         previous_message_id=get_setting(str(chat_id)+"_server_message_id")
         print(previous_message_id)
         if previous_message_id:
-            previous_message_id=previous_message_id[0][0]
-            await app.edit_message_text(chat_id,previous_message_id,msg)
+            previous_message_id=previous_message_id[0][1]
+            await app.edit_message_text(chat_id,int(previous_message_id),msg)
          
 
 def is_english(text):
