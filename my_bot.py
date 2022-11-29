@@ -74,7 +74,7 @@ async def server_status():
     msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
     msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
     for chat_id in admin_chat_ids:
-        previous_message_id=get_setting(chat_id+"_server_message_id")
+        previous_message_id=get_setting(str(chat_id)+"_server_message_id")
         print(previous_message_id)
         if previous_message_id:
             previous_message_id=previous_message_id[0][0]
@@ -636,7 +636,7 @@ async def server(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
         # beautiful message
-        previous_message_id=get_setting(chat_id+"_server_message_id")
+        previous_message_id=get_setting(str(chat_id)+"_server_message_id")
         if previous_message_id:
             #reply to the previous message
             await app.send_message(chat_id, "Here is the server details : ", reply_to_message_id=previous_message_id)
@@ -648,7 +648,7 @@ async def server(client, message):
         msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
         sentmsg = await message.reply(msg)
         await sentmsg.pin()
-        set_setting(chat_id+"_server_message_id", sentmsg.message_id)
+        set_setting(str(chat_id)+"_server_message_id", sentmsg.message_id)
 
 
 @app.on_message(filters.command(["restart"]))
