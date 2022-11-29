@@ -640,6 +640,8 @@ async def server(client, message):
         if previous_message_id:
             #reply to the previous message
             await app.send_message(chat_id, "Here is the server details : ", reply_to_message_id=int(previous_message_id[1]))
+            #pin the message
+            await app.pin_chat_message(chat_id, int(previous_message_id[1]))
             return
 
         msg = "Server details : \n"
