@@ -650,18 +650,6 @@ async def server(client, message):
         sentmsg = await message.reply(msg)
         await sentmsg.pin()
         set_setting(chat_id+"_server_message_id", sentmsg.message_id)
-        while True:
-            try:
-                await asyncio.sleep(2)
-                msg = "Server details : \n"
-                msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
-                msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
-                msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
-                # /restart to restart the server
-                await app.send_message(chat_id, "\n`/restart` - Restart the server")
-                await sentmsg.edit(msg)
-            except:
-                pass
 
 
 @app.on_message(filters.command(["restart"]))
