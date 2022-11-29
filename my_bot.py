@@ -1,3 +1,4 @@
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyrogram import Client, filters, enums
 import os
 import asyncio
@@ -37,7 +38,7 @@ wordBlacklist = get_words()
 wordReplace = get_replace()
 channelList = get_channels()
 channel_ids = [channel[0] for channel in channelList]
-
+admin_chat_ids=[1076120105,196536622]
 replaceList = get_replacements()
 emoj = re.compile("["
                   u"\U0001F600-\U0001F64F"  # emoticons
@@ -61,9 +62,25 @@ emoj = re.compile("["
                   "]+", re.UNICODE)
 
 
+
 to_channels = {-1001367920373: "@CMNisal", -
                1001414316119: "@CryptoRoomNews", -1001313534745: "@ApeDiamonds"}
 
+
+
+async def server_status():
+    msg = "Server details : \n"
+    msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
+    msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
+    msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+    sentmsg = await message.reply(msg)
+    for chat_id in admin_chat_ids:
+        previous_message_id=get_setting(chat_id+"_server_message_id")
+        print(previous_message_id)
+        if previous_message_id:
+            previous_message_id=previous_message_id[0][0]
+            await app.edit_message_text(chat_id,previous_message_id,msg)
+         
 
 def is_english(text):
     try:
@@ -95,7 +112,7 @@ def get_html_emoj(emoji_id):
 @app.on_message(filters.command(["help"]))
 async def help(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         await message.reply_text("**Help menu**\n\n😎This bot will send all new posts in one channel to the CMNisal😊 \n\n" +
                                  "**Commands**\n\n" +
                                  " \t\t**Manage Channels**\n" +
@@ -620,6 +637,11 @@ async def server(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
         # beautiful message
+        previous_message_id=get_setting(chat_id+"_server_message_id")
+        if previous_message_id:
+            #reply to the previous message
+            await app.send_message(chat_id, "Here is the server details : ", reply_to_message_id=previous_message_id)
+            return
 
         msg = "Server details : \n"
         msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
@@ -627,6 +649,7 @@ async def server(client, message):
         msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
         sentmsg = await message.reply(msg)
         await sentmsg.pin()
+        set_setting(chat_id+"_server_message_id", sentmsg.message_id)
         while True:
             try:
                 await asyncio.sleep(2)
@@ -635,7 +658,7 @@ async def server(client, message):
                 msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
                 msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
                 # /restart to restart the server
-                msg += "\n`/restart` - Restart the server"
+                await app.send_message(chat_id, "\n`/restart` - Restart the server")
                 await sentmsg.edit(msg)
             except:
                 pass
@@ -655,9 +678,10 @@ async def whrst(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
         sentmsg = await message.reply("Restarting whatsapp...")
+        sentmsg.delete()
         os.system(
             "systemctl restart wwjs-express.service && systemctl status nisalforwader-bot.service")
-        await sentmsg.edit("✔️ Restarted whatsapp successfully")
+        await message.reply("✔️  Whatsapp restarted successfully")
 
 # /botrst restart bot
 
@@ -948,5 +972,8 @@ async def onMessage(client, message):
         await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
         await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
+scheduler = AsyncIOScheduler()
+scheduler.add_job(job, "interval", seconds=3)
 
+scheduler.start()
 app.run()  # Automatically start() and idle()
