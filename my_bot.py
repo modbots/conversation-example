@@ -639,7 +639,7 @@ async def server(client, message):
         previous_message_id=get_setting(str(chat_id)+"_server_message_id")
         if previous_message_id:
             #reply to the previous message
-            await app.send_message(chat_id, "Here is the server details : ", reply_to_message_id=previous_message_id[1])
+            await app.send_message(chat_id, "Here is the server details : ", reply_to_message_id=int(previous_message_id[1]))
             return
 
         msg = "Server details : \n"
