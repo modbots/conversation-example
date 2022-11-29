@@ -12,5 +12,3 @@ pytz==2022.6
 six==1.16.0
 TgCrypto==1.2.4
 tomli==2.0.1
-psutil
-apscheduler
