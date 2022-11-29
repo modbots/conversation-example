@@ -73,7 +73,6 @@ async def server_status():
     msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
     msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
     msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
-    sentmsg = await message.reply(msg)
     for chat_id in admin_chat_ids:
         previous_message_id=get_setting(chat_id+"_server_message_id")
         print(previous_message_id)
