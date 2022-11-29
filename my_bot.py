@@ -40,6 +40,9 @@ channelList = get_channels()
 channel_ids = [channel[0] for channel in channelList]
 admin_chat_ids=[1076120105,196536622]
 replaceList = get_replacements()
+
+
+
 emoj = re.compile("["
                   u"\U0001F600-\U0001F64F"  # emoticons
                   u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -67,6 +70,8 @@ to_channels = {-1001367920373: "@CMNisal", -
                1001414316119: "@CryptoRoomNews", -1001313534745: "@ApeDiamonds"}
 
 
+app.send_animation(admin_chat_ids[0], "bot restared")
+app.send_animation(admin_chat_ids[1], "bot restared")
 
 async def server_status():
     msg = "Server details : \n"
