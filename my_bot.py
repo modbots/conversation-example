@@ -610,11 +610,21 @@ async def listreps(client, message):
 async def server(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
+        #beautiful message
+        
         msg = "Server details : \n"
-        msg += "CPU : "+str(psutil.cpu_percent())+"%\n"
-        msg += "RAM : "+str(psutil.virtual_memory().percent)+"%\n"
-        msg += "Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
-        await message.reply(msg)
+        msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
+        msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
+        msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+        sentmsg = await message.reply(msg)
+        while True:
+            await asyncio.sleep(2)
+            msg = "Server details : \n"
+            msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
+            msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
+            msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+            await sentmsg.edit(msg)
+
 
 
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
