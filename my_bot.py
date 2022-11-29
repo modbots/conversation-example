@@ -648,7 +648,7 @@ async def server(client, message):
         msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
         sentmsg = await message.reply(msg)
         await sentmsg.pin()
-        set_setting(str(chat_id)+"_server_message_id", sentmsg.message_id)
+        add_setting(str(chat_id)+"_server_message_id", sentmsg.message_id)
 
 
 @app.on_message(filters.command(["restart"]))
