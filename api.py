@@ -150,3 +150,31 @@ def get_replacements():
         replacements[row[0]] = row[1]
     cur.close()
     return replacements
+
+#create table for server settings
+cur = conn.cursor()
+cur.execute("CREATE TABLE IF NOT EXISTS settings ( server_name TEXT, value TEXT, PRIMARY KEY (server_name))")
+conn.commit()
+
+def add_setting(server_name, value):
+    cur = conn.cursor()
+    #if word already exists return false
+    cur.execute("SELECT * FROM settings WHERE server_name = %s", (server_name,))
+    if cur.fetchone() is not None:
+        cur.execute("UPDATE settings SET value = %s WHERE server_name = %s", (value, server_name))
+        conn.commit()
+        cur.close()
+        return True
+    #else add word
+    cur = conn.cursor()
+    cur.execute("INSERT INTO settings (server_name, value) VALUES (%s, %s)", (server_name, value))
+    conn.commit()
+    cur.close()
+    return True
+
+def get_setting(server_name):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM settings WHERE server_name = %s", (server_name,))
+    row = cur.fetchone()
+    cur.close()
+    return row

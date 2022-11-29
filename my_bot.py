@@ -7,7 +7,7 @@ from api import add_channel,\
     delete_all_channels, add_word, \
     delete_word, get_words, \
     delete_all_words, get_replace,\
-    add_replace, delete_replace, get_replacements
+    add_replace, delete_replace, get_replacements,add_setting,get_setting
 
 import re
 from convopyro import Conversation
@@ -90,9 +90,6 @@ def is_in_blacklist(text):
 def get_html_emoj(emoji_id):
     return
 
-
-app.send_message(1076120105, '✔️ Server started successfully')
-app.send_message(196536622, '✔️ Server started successfully')
 
 
 @app.on_message(filters.command(["help"]))
