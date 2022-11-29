@@ -77,6 +77,7 @@ async def server_status():
     msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
     if previous_msg==msg:
         return
+    previous_msg=msg
     for chat_id in admin_chat_ids:
         previous_message_id=get_setting(str(chat_id)+"_server_message_id")
         if previous_message_id:
