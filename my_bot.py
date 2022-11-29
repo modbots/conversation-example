@@ -691,7 +691,7 @@ async def botrst(client, message):
 
 @app.on_message()
 async def onMessage(client, message):
-    print("message")
+    print(message)
 # @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 # async def onMessage(client, message):
 
