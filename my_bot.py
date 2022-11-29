@@ -961,7 +961,7 @@ async def onMessage(client, message):
         await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
 scheduler = AsyncIOScheduler()
-scheduler.add_job(job, "interval", seconds=3)
+scheduler.add_job(server_status, "interval", seconds=3)
 
 scheduler.start()
 app.run()  # Automatically start() and idle()
