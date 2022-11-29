@@ -70,8 +70,8 @@ to_channels = {-1001367920373: "@CMNisal", -
                1001414316119: "@CryptoRoomNews", -1001313534745: "@ApeDiamonds"}
 
 
-app.send_animation(admin_chat_ids[0], "bot restared")
-app.send_animation(admin_chat_ids[1], "bot restared")
+app.send_message(admin_chat_ids[0], "bot restared")
+app.send_message(admin_chat_ids[1], "bot restared")
 
 async def server_status():
     msg = "Server details : \n"
