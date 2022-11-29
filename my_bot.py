@@ -829,9 +829,7 @@ async def onMessage(client, message):
     footer = channel[2]
     for to_channel_id, to_channel_username in to_channels.items():
         await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
-
-        if "<username>" in footer:
-            nFooter = footer.replace("<username>", to_channel_username)
+        nFooter=footer.replace("<username>", to_channel_username)
         caption = replacing_text+"\n\n"+nfooter
         # if channel type is all
         if channel[1] == "all":
