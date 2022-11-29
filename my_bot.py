@@ -75,6 +75,7 @@ async def server_status():
     msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
     msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
     msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+    global previous_msg
     if previous_msg==msg:
         return
     previous_msg=msg
