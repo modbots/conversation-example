@@ -619,12 +619,15 @@ async def server(client, message):
         msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
         sentmsg = await message.reply(msg)
         while True:
-            await asyncio.sleep(2)
-            msg = "Server details : \n"
-            msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
-            msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
-            msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
-            await sentmsg.edit(msg)
+            try:
+                await asyncio.sleep(2)
+                msg = "Server details : \n"
+                msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
+                msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
+                msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+                await sentmsg.edit(msg)
+            except:
+                pass
 
 
 
