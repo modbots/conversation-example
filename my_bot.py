@@ -69,12 +69,14 @@ emoj = re.compile("["
 to_channels = {-1001367920373: "@CMNisal", -
                1001414316119: "@CryptoRoomNews", -1001313534745: "@ApeDiamonds"}
 
-
+previous_msg=""
 async def server_status():
     msg = "Server details : \n"
     msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
     msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
     msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+    if previous_msg==msg:
+        return
     for chat_id in admin_chat_ids:
         previous_message_id=get_setting(str(chat_id)+"_server_message_id")
         if previous_message_id:

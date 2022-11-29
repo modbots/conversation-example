@@ -178,3 +178,24 @@ def get_setting(server_name):
     row = cur.fetchone()
     cur.close()
     return row
+
+# #create table for recepients
+# cur = conn.cursor()
+# cur.execute("CREATE TABLE IF NOT EXISTS recepients (server_name TEXT, recepient TEXT, PRIMARY KEY (server_name))")
+# conn.commit()
+
+# def add_recepient(server_name, recepient):
+#     cur = conn.cursor()
+#     #if word already exists return false
+#     cur.execute("SELECT * FROM recepients WHERE server_name = %s", (server_name,))
+#     if cur.fetchone() is not None:
+#         cur.execute("UPDATE recepients SET recepient = %s WHERE server_name = %s", (recepient, server_name))
+#         conn.commit()
+#         cur.close()
+#         return True
+#     #else add word
+#     cur = conn.cursor()
+#     cur.execute("INSERT INTO recepients (server_name, recepient) VALUES (%s, %s)", (server_name, recepient))
+#     conn.commit()
+#     cur.close()
+#     return True
