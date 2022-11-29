@@ -75,9 +75,9 @@ async def server_status():
     msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
     for chat_id in admin_chat_ids:
         previous_message_id=get_setting(str(chat_id)+"_server_message_id")
-        print(previous_message_id)
         if previous_message_id:
             previous_message_id=previous_message_id[0][1]
+            print(previous_message_id)
             await app.edit_message_text(chat_id,int(previous_message_id),msg)
          
 
