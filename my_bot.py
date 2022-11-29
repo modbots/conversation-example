@@ -16,6 +16,7 @@ import pandas as pd
 from random import choice as rand_choice
 import requests
 
+
 def random_with_N_digits(n):
     range_start = 10**(n-1)
     range_end = (10**n)-1
@@ -90,6 +91,10 @@ def get_html_emoj(emoji_id):
     return
 
 
+app.send_message(1076120105, '✔️ Server started successfully')
+app.send_message(196536622, '✔️ Server started successfully')
+
+
 @app.on_message(filters.command(["help"]))
 async def help(client, message):
     chat_id = message.chat.id
@@ -114,6 +119,11 @@ async def help(client, message):
                                  "🪛/whcr - Creates a whatsapp group.\n" +
                                  "🪛/whdel - Delete a whatsapp group.\n" +
                                  "🪛/whlist - List all whatsapp groups.\n\n" +
+                                 "\t\t**Manage Server**\n" +
+                                 "🪛/server - Check the server status.\n" +
+                                 "🪛/restart - Restart the server.\n" +
+                                 "🪛/whrst - Restart the whatsapp service.\n" +
+                                 "🪛/botrst - Restart the forwarding bot.\n\n" +
                                  "**Note**\n🔸This bot will only forward posts from channels that are in English.\n" +
                                  "🔸This bot will not forward posts that contain words in the blacklist.\n" +
                                  "🔸This bot will replace words in the replace list with the corresponding word in the replace list." +
@@ -605,19 +615,21 @@ async def listreps(client, message):
         else:
             await message.reply("You haven't added any replacement yet ❗️")
 
-#server details
+# server details
+
+
 @app.on_message(filters.command(["server"]))
 async def server(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
-        #beautiful message
-        
+        # beautiful message
+
         msg = "Server details : \n"
         msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
         msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
         msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
         sentmsg = await message.reply(msg)
-        message.pin()
+        await sentmsg.pin()
         while True:
             try:
                 await asyncio.sleep(2)
@@ -631,12 +643,35 @@ async def server(client, message):
             except:
                 pass
 
+
 @app.on_message(filters.command(["restart"]))
 async def server(client, message):
     chat_id = message.chat.id
     if chat_id == 1076120105 or chat_id == 196536622:
-        await message.reply("Restarting the server...")
+        sentmsg = await message.reply("Restarting the server...")
         os.system("sudo reboot")
+
+
+# /whrst restart whatsapp
+@app.on_message(filters.command(["whrst"]))
+async def whrst(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        sentmsg = await message.reply("Restarting whatsapp...")
+        os.system(
+            "systemctl restart wwjs-express.service && systemctl status nisalforwader-bot.service")
+        await sentmsg.edit("✔️ Restarted whatsapp successfully")
+
+# /botrst restart bot
+
+
+@app.on_message(filters.command(["botrst"]))
+async def botrst(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        sentmsg = await message.reply("Restarting the bot...")
+        os.system("systemctl restart bot.service nisalforward.service")
+        await sentmsg.edit("✔️ Restarted the bot successfully")
 
 
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
@@ -863,7 +898,7 @@ async def onMessage(client, message):
     footer = channel[2]
     for to_channel_id, to_channel_username in to_channels.items():
         await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
-        nFooter=footer.replace("<username>", to_channel_username)
+        nFooter = footer.replace("<username>", to_channel_username)
         caption = replacing_text+"\n\n"+nFooter
         # if channel type is all
         if channel[1] == "all":
@@ -915,7 +950,6 @@ async def onMessage(client, message):
 
         await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
         await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
-
 
 
 app.run()  # Automatically start() and idle()
