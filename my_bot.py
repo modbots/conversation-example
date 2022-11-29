@@ -16,7 +16,6 @@ import pandas as pd
 from random import choice as rand_choice
 import requests
 
-
 def random_with_N_digits(n):
     range_start = 10**(n-1)
     range_end = (10**n)-1
@@ -618,6 +617,7 @@ async def server(client, message):
         msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
         msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
         sentmsg = await message.reply(msg)
+        message.pin()
         while True:
             try:
                 await asyncio.sleep(2)
@@ -625,10 +625,18 @@ async def server(client, message):
                 msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
                 msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
                 msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+                # /restart to restart the server
+                msg += "\n`/restart` - Restart the server"
                 await sentmsg.edit(msg)
             except:
                 pass
 
+@app.on_message(filters.command(["restart"]))
+async def server(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        await message.reply("Restarting the server...")
+        os.system("sudo reboot")
 
 
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
