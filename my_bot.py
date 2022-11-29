@@ -1,5 +1,6 @@
 from pyrogram import Client, filters, enums
 import os
+import psutil
 from api import add_channel,\
     delete_channel, get_channels, \
     delete_all_channels, add_word, \
@@ -604,6 +605,17 @@ async def listreps(client, message):
         else:
             await message.reply("You haven't added any replacement yet ❗️")
 
+#server details
+@app.on_message(filters.command(["server"]))
+async def server(client, message):
+    chat_id = message.chat.id
+    if chat_id == 1076120105 or chat_id == 196536622:
+        msg = "Server details : \n"
+        msg += "CPU : "+str(psutil.cpu_percent())+"%\n"
+        msg += "RAM : "+str(psutil.virtual_memory().percent)+"%\n"
+        msg += "Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
+        await message.reply(msg)
+
 
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
@@ -881,5 +893,7 @@ async def onMessage(client, message):
 
         await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
         await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
+
+
 
 app.run()  # Automatically start() and idle()
