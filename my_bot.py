@@ -689,285 +689,282 @@ async def botrst(client, message):
         await sentmsg.edit("✔️ Restarted the bot successfully")
 
 
-@app.on_message()
+@app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
-    print(message)
-# @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
-# async def onMessage(client, message):
 
-#     channel_id = str(message.chat.id)
-#     # import pickle
+    channel_id = str(message.chat.id)
+    # import pickle
 
-#     # pickle.dump(message, open("message.pickle", "wb"))
+    # pickle.dump(message, open("message.pickle", "wb"))
 
-#     if channel_id not in channel_ids:
-#         return
-#     orginal_text = message.text or message.caption or ""
-#     if not is_english(orginal_text) or is_in_blacklist(orginal_text):
-#         return
-#     entities = message.entities or message.caption_entities
-#     if entities:
-#         for entity in entities:
-#             if entity.type == enums.MessageEntityType.HASHTAG:
-#                 entities.remove(entity)
-#             if entity.type == enums.MessageEntityType.CASHTAG:
-#                 entities.remove(entity)
+    if channel_id not in channel_ids:
+        return
+    orginal_text = message.text or message.caption or ""
+    if not is_english(orginal_text) or is_in_blacklist(orginal_text):
+        return
+    entities = message.entities or message.caption_entities
+    if entities:
+        for entity in entities:
+            if entity.type == enums.MessageEntityType.HASHTAG:
+                entities.remove(entity)
+            if entity.type == enums.MessageEntityType.CASHTAG:
+                entities.remove(entity)
 
-#     entity_html_dict = {}
-#     replacing_text = orginal_text
-#     offset_change = 0
-#     global before_offset
-#     before_offset = 0
-#     # convert all entities to HTML
-#     if entities:
-#         for entity in entities:
-#             before_entity_text = orginal_text[entity.offset:entity.offset + entity.length]
-#             before_to_entity = orginal_text[before_offset:entity.offset + entity.length]
-#             key = f"{entity.offset}:{entity.offset + entity.length}"
-#             if before_entity_text.strip() == '':
-#                 continue
-#             if entity.type == enums.MessageEntityType.BOLD:
-#                 if key not in entity_html_dict:
-#                     replacing_part = "<b>" + before_entity_text+"</b>"
-#                 else:
-#                     replacing_part = "<b>"+entity_html_dict[key][0]+"</b>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+    entity_html_dict = {}
+    replacing_text = orginal_text
+    offset_change = 0
+    global before_offset
+    before_offset = 0
+    # convert all entities to HTML
+    if entities:
+        for entity in entities:
+            before_entity_text = orginal_text[entity.offset:entity.offset + entity.length]
+            before_to_entity = orginal_text[before_offset:entity.offset + entity.length]
+            key = f"{entity.offset}:{entity.offset + entity.length}"
+            if before_entity_text.strip() == '':
+                continue
+            if entity.type == enums.MessageEntityType.BOLD:
+                if key not in entity_html_dict:
+                    replacing_part = "<b>" + before_entity_text+"</b>"
+                else:
+                    replacing_part = "<b>"+entity_html_dict[key][0]+"</b>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.TEXT_LINK:
-#                 if key not in entity_html_dict:
-#                     replacing_part = "<a href='"+entity.url+"'>" + before_entity_text+"</a>"
-#                 else:
-#                     replacing_part = "<a href='"+entity.url + \
-#                         "'>"+entity_html_dict[key][0]+"</a>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+            elif entity.type == enums.MessageEntityType.TEXT_LINK:
+                if key not in entity_html_dict:
+                    replacing_part = "<a href='"+entity.url+"'>" + before_entity_text+"</a>"
+                else:
+                    replacing_part = "<a href='"+entity.url + \
+                        "'>"+entity_html_dict[key][0]+"</a>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.TEXT_MENTION:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.TEXT_MENTION:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<a href='tg://user?id=" + \
-#                         str(entity.user_id)+"'>" + before_entity_text+"</a>"
-#                 else:
-#                     replacing_part = "<a href='tg://user?id=" + \
-#                         str(entity.user_id)+"'>" + \
-#                         entity_html_dict[key][0]+"</a>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<a href='tg://user?id=" + \
+                        str(entity.user_id)+"'>" + before_entity_text+"</a>"
+                else:
+                    replacing_part = "<a href='tg://user?id=" + \
+                        str(entity.user_id)+"'>" + \
+                        entity_html_dict[key][0]+"</a>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.ITALIC:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.ITALIC:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<i>" + before_entity_text+"</i>"
-#                 else:
-#                     replacing_part = "<i>"+entity_html_dict[key][0]+"</i>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<i>" + before_entity_text+"</i>"
+                else:
+                    replacing_part = "<i>"+entity_html_dict[key][0]+"</i>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.CODE:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.CODE:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<code>" + before_entity_text+"</code>"
-#                 else:
-#                     replacing_part = "<code>" + \
-#                         entity_html_dict[key][0]+"</code>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<code>" + before_entity_text+"</code>"
+                else:
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.PRE:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.PRE:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<pre>" + before_entity_text+"</pre>"
-#                 else:
-#                     replacing_part = "<pre>"+entity_html_dict[key][0]+"</pre>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<pre>" + before_entity_text+"</pre>"
+                else:
+                    replacing_part = "<pre>"+entity_html_dict[key][0]+"</pre>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.UNDERLINE:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.UNDERLINE:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<u>" + before_entity_text+"</u>"
-#                 else:
-#                     replacing_part = "<u>"+entity_html_dict[key][0]+"</u>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<u>" + before_entity_text+"</u>"
+                else:
+                    replacing_part = "<u>"+entity_html_dict[key][0]+"</u>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.STRIKETHROUGH:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.STRIKETHROUGH:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<s>" + before_entity_text+"</s>"
-#                 else:
-#                     replacing_part = "<s>"+entity_html_dict[key][0]+"</s>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<s>" + before_entity_text+"</s>"
+                else:
+                    replacing_part = "<s>"+entity_html_dict[key][0]+"</s>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.BOT_COMMAND:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.BOT_COMMAND:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<code>" + before_entity_text+"</code>"
-#                 else:
-#                     replacing_part = "<code>" + \
-#                         entity_html_dict[key][0]+"</code>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<code>" + before_entity_text+"</code>"
+                else:
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.URL:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.URL:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<a href='" + \
-#                         before_entity_text+"'>" + before_entity_text+"</a>"
-#                 else:
-#                     replacing_part = "<a href='" + before_entity_text + \
-#                         "'>"+entity_html_dict[key][0]+"</a>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<a href='" + \
+                        before_entity_text+"'>" + before_entity_text+"</a>"
+                else:
+                    replacing_part = "<a href='" + before_entity_text + \
+                        "'>"+entity_html_dict[key][0]+"</a>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.EMAIL:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.EMAIL:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<a href='mailto:" + \
-#                         before_entity_text+"'>" + before_entity_text+"</a>"
-#                 else:
-#                     replacing_part = "<a href='mailto:" + before_entity_text + \
-#                         "'>"+entity_html_dict[key][0]+"</a>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<a href='mailto:" + \
+                        before_entity_text+"'>" + before_entity_text+"</a>"
+                else:
+                    replacing_part = "<a href='mailto:" + before_entity_text + \
+                        "'>"+entity_html_dict[key][0]+"</a>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.PHONE_NUMBER:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.PHONE_NUMBER:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<a href='tel:" + \
-#                         before_entity_text+"'>" + before_entity_text+"</a>"
-#                 else:
-#                     replacing_part = "<a href='tel:" + \
-#                         entity_html_dict[key][0]+"'>"+replacing_part+"</a>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<a href='tel:" + \
+                        before_entity_text+"'>" + before_entity_text+"</a>"
+                else:
+                    replacing_part = "<a href='tel:" + \
+                        entity_html_dict[key][0]+"'>"+replacing_part+"</a>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.SPOILER:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.SPOILER:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<code>" + before_entity_text+"</code>"
-#                 else:
-#                     replacing_part = "<code>" + \
-#                         entity_html_dict[key][0]+"</code>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<code>" + before_entity_text+"</code>"
+                else:
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.BLOCKQUOTE:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.BLOCKQUOTE:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<blockquote>" + before_entity_text+"</blockquote>"
-#                 else:
-#                     replacing_part = "<blockquote>" + \
-#                         entity_html_dict[key][0]+"</blockquote>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<blockquote>" + before_entity_text+"</blockquote>"
+                else:
+                    replacing_part = "<blockquote>" + \
+                        entity_html_dict[key][0]+"</blockquote>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.BANK_CARD:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.BANK_CARD:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<code>" + before_entity_text+"</code>"
-#                 else:
-#                     replacing_part = "<code>" + \
-#                         entity_html_dict[key][0]+"</code>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
+                    replacing_part = "<code>" + before_entity_text+"</code>"
+                else:
+                    replacing_part = "<code>" + \
+                        entity_html_dict[key][0]+"</code>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
 
-#             elif entity.type == enums.MessageEntityType.CUSTOM_EMOJI:
-#                 if key not in entity_html_dict:
+            elif entity.type == enums.MessageEntityType.CUSTOM_EMOJI:
+                if key not in entity_html_dict:
 
-#                     replacing_part = "<emoji id='" + \
-#                         str(entity.custom_emoji_id)+"'>" + \
-#                         before_entity_text+"</emoji>"
-#                 else:
-#                     replacing_part = "<emoji id='" + \
-#                         str(entity.custom_emoji_id) + \
-#                         "'>"+entity_html_dict[key][0]+"</emoji>"
-#                 entity_html_dict[key] = [replacing_part,
-#                                          before_to_entity, before_entity_text]
-#             before_offset = entity.offset + entity.length
+                    replacing_part = "<emoji id='" + \
+                        str(entity.custom_emoji_id)+"'>" + \
+                        before_entity_text+"</emoji>"
+                else:
+                    replacing_part = "<emoji id='" + \
+                        str(entity.custom_emoji_id) + \
+                        "'>"+entity_html_dict[key][0]+"</emoji>"
+                entity_html_dict[key] = [replacing_part,
+                                         before_to_entity, before_entity_text]
+            before_offset = entity.offset + entity.length
 
-#     for entity_html_dict_key in entity_html_dict:
-#         entity_html_dict_value = entity_html_dict[entity_html_dict_key]
-#         start = int(entity_html_dict_key.split(":")[0])
-#         end = int(entity_html_dict_key.split(":")[1])
-#         replace_text = entity_html_dict_value[0]
-#         # if replace_text is an empty tag, remove it regex
-#         if re.search("<[A-z]>\s*<\/[A-z]>", replace_text):
-#             continue
-#         before_text = entity_html_dict_value[1]
-#         replacing_part = entity_html_dict_value[2]
-#         replacing_text = replacing_text.replace(
-#             before_text, before_text.replace(replacing_part, replace_text))
+    for entity_html_dict_key in entity_html_dict:
+        entity_html_dict_value = entity_html_dict[entity_html_dict_key]
+        start = int(entity_html_dict_key.split(":")[0])
+        end = int(entity_html_dict_key.split(":")[1])
+        replace_text = entity_html_dict_value[0]
+        # if replace_text is an empty tag, remove it regex
+        if re.search("<[A-z]>\s*<\/[A-z]>", replace_text):
+            continue
+        before_text = entity_html_dict_value[1]
+        replacing_part = entity_html_dict_value[2]
+        replacing_text = replacing_text.replace(
+            before_text, before_text.replace(replacing_part, replace_text))
 
-#     #remove @channelusername
-#     replacing_text = re.sub(r'@([A-Za-z0-9_]+)', '', replacing_text)
-#     # if ends with multiple new lines remove them
-#     replacing_text = re.sub(r'\n+$|<[A-z]><\/[A-z]>', '', replacing_text)
-#     replacing_text = re.sub(r'<[A-z]>\s+<\/[A-z]>', ' ', replacing_text)
-#     df = pd.DataFrame({"Text": [replacing_text]})
-#     df["Text"] = df["Text"].replace(replaceList, regex=True)
-#     replacing_text = df["Text"][0]
-#     reactionEmojiList = ["👍", "🔥", "😍", "🤯", "🎉", "👏"]
+    #remove @channelusername
+    replacing_text = re.sub(r'@([A-Za-z0-9_]+)', '', replacing_text)
+    # if ends with multiple new lines remove them
+    replacing_text = re.sub(r'\n+$|<[A-z]><\/[A-z]>', '', replacing_text)
+    replacing_text = re.sub(r'<[A-z]>\s+<\/[A-z]>', ' ', replacing_text)
+    df = pd.DataFrame({"Text": [replacing_text]})
+    df["Text"] = df["Text"].replace(replaceList, regex=True)
+    replacing_text = df["Text"][0]
+    reactionEmojiList = ["👍", "🔥", "😍", "🤯", "🎉", "👏"]
 
-#     # get channel tuple from channels list
-#     channel = [channel for channel in channelList if channel[0] == channel_id][0]
-#     footer = channel[2]
-#     for to_channel_id, to_channel_username in to_channels.items():
-#         await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
-#         nFooter = footer.replace("<username>", to_channel_username)
-#         caption = replacing_text+"\n\n"+nFooter
-#         # if channel type is all
-#         if channel[1] == "all":
-#             if message.media_group_id:
-#                 sentMessage = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+    # get channel tuple from channels list
+    channel = [channel for channel in channelList if channel[0] == channel_id][0]
+    footer = channel[2]
+    for to_channel_id, to_channel_username in to_channels.items():
+        await client.send_chat_action(to_channel_id, enums.ChatAction.TYPING)
+        nFooter = footer.replace("<username>", to_channel_username)
+        caption = replacing_text+"\n\n"+nFooter
+        # if channel type is all
+        if channel[1] == "all":
+            if message.media_group_id:
+                sentMessage = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
 
-#             elif message.photo:
-#                 sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, parse_mode=enums.ParseMode.HTML, caption=caption)
-#             elif message.video:
-#                 sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
-#             elif message.audio:
-#                 sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
-#             elif message.document:
-#                 sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
-#             elif message.text:
-#                 sentMessage1 = await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML)
+            elif message.photo:
+                sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, parse_mode=enums.ParseMode.HTML, caption=caption)
+            elif message.video:
+                sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.audio:
+                sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.document:
+                sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.text:
+                sentMessage1 = await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML)
 
-#         # if channel type is media_text
-#         elif channel[1] == "media_text":
-#             if message.media_group_id:
-#                 sentMessage1 = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
-#             elif message.photo:
-#                 sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
-#             elif message.video:
-#                 sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
-#             elif message.audio:
-#                 sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
-#             elif message.document:
-#                 sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
-#         # if channel type is media
-#         elif channel[1] == "media":
-#             if message.media_group_id:
-#                 sentMessage1 = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
-#             elif message.photo:
-#                 sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, captions=caption)
-#             elif message.video:
-#                 sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, captions=caption)
-#             elif message.audio:
-#                 sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, captions=caption)
-#             elif message.document:
-#                 sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, captions=caption)
-#         # if channel type is text
-#         elif channel[1] == "text":
-#             if message.text:
-#                 sentMessage1 = await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML)
+        # if channel type is media_text
+        elif channel[1] == "media_text":
+            if message.media_group_id:
+                sentMessage1 = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+            elif message.photo:
+                sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.video:
+                sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.audio:
+                sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+            elif message.document:
+                sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, caption=caption, parse_mode=enums.ParseMode.HTML)
+        # if channel type is media
+        elif channel[1] == "media":
+            if message.media_group_id:
+                sentMessage1 = await client.copy_media_group(to_channel_id, message.chat.id, message.id, captions=caption)
+            elif message.photo:
+                sentMessage1 = await client.send_photo(to_channel_id, photo=message.photo.file_id, captions=caption)
+            elif message.video:
+                sentMessage1 = await client.send_video(to_channel_id, message.video.file_id, captions=caption)
+            elif message.audio:
+                sentMessage1 = await client.send_audio(to_channel_id, message.audio.file_id, captions=caption)
+            elif message.document:
+                sentMessage1 = await client.send_document(to_channel_id, message.document.file_id, captions=caption)
+        # if channel type is text
+        elif channel[1] == "text":
+            if message.text:
+                sentMessage1 = await client.send_message(to_channel_id, caption, parse_mode=enums.ParseMode.HTML)
 
-#         sentMessageId = sentMessage1.id
-#         # random the rection emoji
+        sentMessageId = sentMessage1.id
+        # random the rection emoji
 
-#         await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
-#         await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
+        await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
+        await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
 scheduler = AsyncIOScheduler()
 scheduler.add_job(server_status, "interval", seconds=3)
