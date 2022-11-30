@@ -152,7 +152,7 @@ async def help(client, message):
 @ app.on_message(filters.command(["add"]))
 async def add(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         # start a conversation
         await client.send_message(chat_id, "Please send the **channel id**🆔 or **forward**▶️ a message from the channel you want to add. `/cancel` to cancel the process.")
         answer = await listen_message(client, chat_id, timeout=None)
@@ -224,7 +224,7 @@ async def add(client, message):
 @app.on_message(filters.command(["list"]))
 async def list(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
 
         channels = get_channels()
         if channels:
@@ -241,7 +241,7 @@ async def list(client, message):
 @app.on_message(filters.command(["delete"]))
 async def delete(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
 
         channels = get_channels()
         if channels:
@@ -299,7 +299,7 @@ async def delete(client, message):
 @app.on_message(filters.command(["whcr"]))
 async def createwh(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         if " " in message.text:
             group_name = message.text.split(" ", 1)[1]
             # create whatsapp group
@@ -343,7 +343,7 @@ async def createwh(client, message):
 @ app.on_message(filters.command(["whlist"]))
 async def listwh(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         msg = await app.send_message(chat_id, "Please wait...")
         groups = requests.post('http://127.0.0.1:3000/get/groups/').json()
         if groups:
@@ -360,7 +360,7 @@ async def listwh(client, message):
 @ app.on_message(filters.command(["whdel"]))
 async def deletewh(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         # send message to user to please wait
         msg = await app.send_message(chat_id, "Please wait...")
         groups = requests.post('http://127.0.0.1:3000/get/groups/').json()
@@ -410,7 +410,7 @@ async def deletewh(client, message):
 @app.on_message(filters.command(["addword"]))
 async def addword(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         global wordBlacklist
         # if is in format /addword hi list;word2;word3
         # remove before first space
@@ -442,7 +442,7 @@ async def addword(client, message):
 async def delword(client, message):
 
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         global wordBlacklist
         words = get_words()
         if words:
@@ -491,7 +491,7 @@ async def delword(client, message):
 @app.on_message(filters.command(["listwords"]))
 async def listwords(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         words = get_words()
         if words:
             msg = "Here is the list of words you have added : \n\n"
@@ -508,7 +508,7 @@ async def listwords(client, message):
 @app.on_message(filters.command(["addrep"]))
 async def addrep(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         global replaceList
         # if is in format /addrep word1=word2
         if " " in message.text:
@@ -573,7 +573,7 @@ async def addrep(client, message):
 @app.on_message(filters.command(["delreps"]))
 async def delrep(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         replacements = get_replace()
         if replacements:
             msg = "Here is the list of replacements you have added : \n"
@@ -622,7 +622,7 @@ async def delrep(client, message):
 @app.on_message(filters.command(["listreps"]))
 async def listreps(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         replacements = get_replace()
         if replacements:
             msg = "Here is the list of replacements you have added : \n\n"
@@ -640,7 +640,7 @@ async def listreps(client, message):
 @app.on_message(filters.command(["server"]))
 async def server(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         # beautiful message
         previous_message_id=get_setting(str(chat_id)+"_server_message_id")
         if previous_message_id:
@@ -665,7 +665,7 @@ async def server(client, message):
 @app.on_message(filters.command(["restart"]))
 async def server(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         sentmsg = await message.reply("Restarting the server...")
         os.system("sudo reboot")
 
@@ -674,7 +674,7 @@ async def server(client, message):
 @app.on_message(filters.command(["whrst"]))
 async def whrst(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         sentmsg = await message.reply("Restarting whatsapp...")
         sentmsg.delete()
         os.system(
@@ -687,7 +687,7 @@ async def whrst(client, message):
 @app.on_message(filters.command(["botrst"]))
 async def botrst(client, message):
     chat_id = message.chat.id
-    if chat_id == 1076120105 or chat_id == 196536622:
+    if chat_id in admin_chat_ids:
         sentmsg = await message.reply("Restarting the bot...")
         os.system("systemctl restart bot.service nisalforward.service")
         await sentmsg.edit("✔️ Restarted the bot successfully")
