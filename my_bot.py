@@ -84,6 +84,7 @@ async def server_status():
         if previous_message_id:
             previous_message_id=previous_message_id[1]
             print(previous_message_id)
+            sleep(1)
             await app.edit_message_text(chat_id,int(previous_message_id),msg)
          
 
@@ -704,7 +705,7 @@ async def onMessage(client, message):
     if channel_id not in channel_ids:
         return
     orginal_text = message.text or message.caption or ""
-    if not is_english(orginal_text) or is_in_blacklist(orginal_text):
+    if is_in_blacklist(orginal_text):
         return
     entities = message.entities or message.caption_entities
     if entities:
