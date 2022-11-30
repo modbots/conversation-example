@@ -84,7 +84,7 @@ async def server_status():
         if previous_message_id:
             previous_message_id=previous_message_id[1]
             print(previous_message_id)
-            sleep(1)
+            await asyncio.sleep(1)
             await app.edit_message_text(chat_id,int(previous_message_id),msg)
          
 
