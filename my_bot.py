@@ -38,7 +38,7 @@ wordBlacklist = get_words()
 wordReplace = get_replace()
 channelList = get_channels()
 channel_ids = [channel[0] for channel in channelList]
-admin_chat_ids=[1076120105,196536622]
+admin_chat_ids=[1076120105,196536622,-1001829071603]
 replaceList = get_replacements()
 
 
