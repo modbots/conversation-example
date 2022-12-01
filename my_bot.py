@@ -133,12 +133,6 @@ async def day_greet_message():
             await app.send_message(chat_id, greet)
 
 
-async def test():
-    for chat_id in admin_chat_ids:
-        if chat_id < 0:
-            await app.send_message(chat_id, 'hi')
-
-
 def is_english(text):
     try:
         text = re.sub(emoj, '', text)
