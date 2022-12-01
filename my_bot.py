@@ -648,7 +648,7 @@ async def server(client, message):
                 #reply to the previous message
                 await app.send_message(chat_id, "Here is the server details : ", reply_to_message_id=int(previous_message_id[1]))
                 #pin the message
-                await app.pin_chat_message(chat_id, int(previous_message_id[1]))
+                await app.pin_chat_message(chat_id, int(previous_message_id[1]),both_sides=True)
                 return
             except:
                 pass
@@ -658,7 +658,7 @@ async def server(client, message):
         msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
         msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
         sentmsg = await message.reply(msg)
-        await sentmsg.pin()
+        await sentmsg.pin(both_sides=True)
         add_setting(str(chat_id)+"_server_message_id", sentmsg.id)
 
 
