@@ -84,7 +84,14 @@ async def server_status():
         if previous_message_id:
             previous_message_id=previous_message_id[1]
             await asyncio.sleep(1)
-            await app.edit_message_text(chat_id,int(previous_message_id),msg)
+            try:
+                await app.edit_message_text(chat_id,int(previous_message_id),msg)
+            except:
+                #delete previous message
+                await app.delete_messages(chat_id,int(previous_message_id), revoke=True)
+                sentmsg = await app.send_message(chat_id, msg)
+                add_setting(str(chat_id)+"_server_message_id",sentmsg.message_id)
+                await sentmsg.pin(both_sides=True)
          
 
 def is_english(text):
