@@ -5,7 +5,7 @@ import re
 if "DATABASE_URL" in os.environ:
     DATABASE_URL = os.environ['DATABASE_URL']
 else:
-    DATABASE_URL = "postgres://tjcrbtchxjetna:ffb450747d26895a29d3a3b6c5a6f1a6619d6870131c04afba453d54cca98e6a@ec2-54-76-43-89.eu-west-1.compute.amazonaws.com:5432/dfsf5klh4quf4q"
+    DATABASE_URL = "postgres://hmqvfyqaymedvw:6ad95cadee89a39c9372e84dfd488a539df3c65c2bc073afbdf071747bde0b2a@ec2-54-155-110-181.eu-west-1.compute.amazonaws.com:5432/d9efgdvlm9ule8"
 
 
 #create connection
