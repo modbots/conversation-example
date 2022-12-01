@@ -88,6 +88,7 @@ async def server_status():
                 await app.edit_message_text(chat_id,int(previous_message_id),msg)
             except:
                 #delete previous message
+                await app.send_message(chat_id, 'kauru hari status message ek delete krla hri mokak hri aulak, onna man ayi pin kala',disable_notification=True)
                 try:
                     await app.delete_messages(chat_id,int(previous_message_id), revoke=True)
                 except:
