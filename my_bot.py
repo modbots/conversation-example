@@ -88,7 +88,10 @@ async def server_status():
                 await app.edit_message_text(chat_id,int(previous_message_id),msg)
             except:
                 #delete previous message
-                await app.delete_messages(chat_id,int(previous_message_id), revoke=True)
+                try:
+                    await app.delete_messages(chat_id,int(previous_message_id), revoke=True)
+                except:
+                    pass
                 sentmsg = await app.send_message(chat_id, msg,disable_notification=True)
                 add_setting(str(chat_id)+"_server_message_id",sentmsg.id)
                 await sentmsg.pin(both_sides=True)
