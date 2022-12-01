@@ -126,8 +126,8 @@ async def day_greet_message():
         greet = rand_choice(day_greet[1])
     if hour == 18:
         greet = rand_choice(day_greet[2])
-    
-    #send the message to admin chats if its a group
+
+    # send the message to admin chats if its a group
     for chat_id in admin_chat_ids:
         if chat_id < 0:
             await app.send_message(chat_id, greet)
@@ -137,6 +137,7 @@ async def test():
     for chat_id in admin_chat_ids:
         if chat_id < 0:
             await app.send_message(chat_id, 'hi')
+
 
 def is_english(text):
     try:
@@ -1020,12 +1021,12 @@ async def onMessage(client, message):
         await client.send_reaction(to_channel_id, sentMessageId, rand_choice(reactionEmojiList))
         await app.send_chat_action(to_channel_id, enums.ChatAction.CANCEL)
 
-scheduler = AsyncIOScheduler()
+scheduler = AsyncIOScheduler(timezone="Asia/Colombo")
 scheduler.add_job(server_status, "interval", seconds=3)
-scheduler.add_job(day_greet_message, "cron", hour=7, minute=0,timezone="Asia/Colombo")
-scheduler.add_job(test, "cron", hour=8, minute=18,timezone="Asia/Colombo")
-scheduler.add_job(day_greet_message, "cron", hour=12, minute=0,timezone="Asia/Colombo")
-scheduler.add_job(day_greet_message, "cron", hour=18, minute=0,timezone="Asia/Colombo")
+scheduler.add_job(day_greet_message, "cron", hour=7, minute=0)
+scheduler.add_job(test, "cron", hour=20, minute=36)
+scheduler.add_job(day_greet_message, "cron", hour=12, minute=0)
+scheduler.add_job(day_greet_message, "cron", hour=18, minute=0)
 
 scheduler.start()
 app.run()  # Automatically start() and idle()
