@@ -1023,7 +1023,7 @@ async def onMessage(client, message):
 scheduler = AsyncIOScheduler()
 scheduler.add_job(server_status, "interval", seconds=3)
 scheduler.add_job(day_greet_message, "cron", hour=7, minute=0,timezone="Asia/Colombo")
-scheduler.add_job(test, "cron", hour=8, minute=17,timezone="Asia/Colombo")
+scheduler.add_job(test, "cron", hour=8, minute=18,timezone="Asia/Colombo")
 scheduler.add_job(day_greet_message, "cron", hour=12, minute=0,timezone="Asia/Colombo")
 scheduler.add_job(day_greet_message, "cron", hour=18, minute=0,timezone="Asia/Colombo")
 
