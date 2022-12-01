@@ -133,6 +133,10 @@ async def day_greet_message():
             await app.send_message(chat_id, greet)
 
 
+async def test():
+    for chat_id in admin_chat_ids:
+        if chat_id < 0:
+            await app.send_message(chat_id, 'hi')
 
 def is_english(text):
     try:
@@ -1019,9 +1023,9 @@ async def onMessage(client, message):
 scheduler = AsyncIOScheduler()
 scheduler.add_job(server_status, "interval", seconds=3)
 scheduler.add_job(day_greet_message, "cron", hour=7, minute=0,timezone="Asia/Colombo")
-scheduler.add_job(day_greet_message, "cron", hour=8, minute=14,timezone="Asia/Colombo")
+scheduler.add_job(day_greet_message, "cron", hour=8, minute=17,timezone="Asia/Colombo")
 scheduler.add_job(day_greet_message, "cron", hour=12, minute=0,timezone="Asia/Colombo")
-scheduler.add_job(day_greet_message, "cron", hour=18, minute=0,timezone="Asia/Colombo")
+scheduler.add_job(test, "cron", hour=18, minute=0,timezone="Asia/Colombo")
 
 scheduler.start()
 app.run()  # Automatically start() and idle()
