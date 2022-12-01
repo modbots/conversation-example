@@ -8,7 +8,7 @@ from api import add_channel,\
     delete_all_channels, add_word, \
     delete_word, get_words, \
     delete_all_words, get_replace,\
-    add_replace, delete_replace, get_replacements,add_setting,get_setting
+    add_replace, delete_replace, get_replacements, add_setting, get_setting
 
 import re
 from convopyro import Conversation
@@ -16,6 +16,7 @@ from convopyro import listen_message
 import pandas as pd
 from random import choice as rand_choice
 import requests
+import datetime
 
 
 def random_with_N_digits(n):
@@ -38,9 +39,8 @@ wordBlacklist = get_words()
 wordReplace = get_replace()
 channelList = get_channels()
 channel_ids = [channel[0] for channel in channelList]
-admin_chat_ids=[1076120105,196536622,-1001829071603]
+admin_chat_ids = [1076120105, 196536622, -1001829071603]
 replaceList = get_replacements()
-
 
 
 emoj = re.compile("["
@@ -65,38 +65,74 @@ emoj = re.compile("["
                   "]+", re.UNICODE)
 
 
-
 to_channels = {-1001367920373: "@CMNisal", -
                1001414316119: "@CryptoRoomNews", -1001313534745: "@ApeDiamonds"}
 
-previous_msg=""
+previous_msg = ""
+
+
 async def server_status():
     msg = "Server details : \n"
     msg += "🖥 CPU : "+str(psutil.cpu_percent())+"%\n"
     msg += "🎟 RAM : "+str(psutil.virtual_memory().percent)+"%\n"
     msg += "💾 Disk : "+str(psutil.disk_usage('/').percent)+"%\n"
     global previous_msg
-    if previous_msg==msg:
+    if previous_msg == msg:
         return
-    previous_msg=msg
+    previous_msg = msg
     for chat_id in admin_chat_ids:
-        previous_message_id=get_setting(str(chat_id)+"_server_message_id")
+        previous_message_id = get_setting(str(chat_id)+"_server_message_id")
         if previous_message_id:
-            previous_message_id=previous_message_id[1]
+            previous_message_id = previous_message_id[1]
             await asyncio.sleep(1)
             try:
-                await app.edit_message_text(chat_id,int(previous_message_id),msg)
+                await app.edit_message_text(chat_id, int(previous_message_id), msg)
             except:
-                #delete previous message
-                await app.send_message(chat_id, 'kauru hari status message ek delete krla hri mokak hri aulak, onna man ayi pin kala',disable_notification=True)
+                # delete previous message
+                await app.send_message(chat_id, 'kauru hari status message ek delete krla hri mokak hri aulak, onna man ayi pin kala', disable_notification=True)
                 try:
-                    await app.delete_messages(chat_id,int(previous_message_id), revoke=True)
+                    await app.delete_messages(chat_id, int(previous_message_id), revoke=True)
                 except:
                     pass
-                sentmsg = await app.send_message(chat_id, msg,disable_notification=True)
-                add_setting(str(chat_id)+"_server_message_id",sentmsg.id)
+                sentmsg = await app.send_message(chat_id, msg, disable_notification=True)
+                add_setting(str(chat_id)+"_server_message_id", sentmsg.id)
                 await sentmsg.pin(both_sides=True)
-         
+
+
+async def day_greet_message():
+    day_greet = [
+        [
+            "Very Good Morning කොල්ලො කෙල්ලො ටික ! අද මොනාද කරන්න තියෙන්නේ ?"
+            "ගුම් මෝනිං කට්ටිය ! අද වැඩ ටික හොඳට කරගන්න !"
+            "Very Very Good Morning කස්ටිය ! අද හොද දවසක් වෙයි නේ ?"
+        ],
+        [
+            "Good Afternoon! අද අව්ව සැරයිද ?",
+            "දවලුත් වෙලානේ ? හරි බඩගිනියි නේ ?",
+            "දැන් දවල් 12හයි නේ, හවස් වෙන්න කලින් අද වැඩ ටික ඉවරකර ගමු !"
+        ],
+        [
+            "හම්මාහ්,මහන්සියි නං පොඩි ආතල් එකක් ගමු නේ !",
+            "Good Evening කස්ටිය,හවසුත් උනානේ!",
+            "හවස් උනානේ,අද වැඩ ටික ඉවරකරා නේ? නැත්තම් ඉක්මන්ට කරමු..."
+        ]
+    ]
+    # get date in gmt 5:30
+    date = datetime.now(timezone('Asia/Colombo'))
+    hour = date.hour
+    if hour == 7:
+        greet = rand_choice(day_greet[0])
+    if hour == 12:
+        greet = rand_choice(day_greet[1])
+    if hour == 18:
+        greet = rand_choice(day_greet[2])
+    
+    #send the message to admin chats if its a group
+    for chat_id in admin_chat_ids:
+        if chat_id < 0:
+            await app.send_message(chat_id, greet)
+
+
 
 def is_english(text):
     try:
@@ -122,7 +158,6 @@ def is_in_blacklist(text):
 
 def get_html_emoj(emoji_id):
     return
-
 
 
 @app.on_message(filters.command(["help"]))
@@ -653,13 +688,13 @@ async def server(client, message):
     chat_id = message.chat.id
     if chat_id in admin_chat_ids:
         # beautiful message
-        previous_message_id=get_setting(str(chat_id)+"_server_message_id")
+        previous_message_id = get_setting(str(chat_id)+"_server_message_id")
         if previous_message_id:
             try:
-                #reply to the previous message
+                # reply to the previous message
                 await app.send_message(chat_id, "Here is the server details : ", reply_to_message_id=int(previous_message_id[1]))
-                #pin the message
-                await app.pin_chat_message(chat_id, int(previous_message_id[1]),both_sides=True)
+                # pin the message
+                await app.pin_chat_message(chat_id, int(previous_message_id[1]), both_sides=True)
                 return
             except:
                 pass
@@ -702,8 +737,8 @@ async def botrst(client, message):
         sentmsg = await message.reply("Restarting the bot...")
         os.system("systemctl restart bot.service nisalforward.service")
         await sentmsg.edit("✔️ Restarted the bot successfully")
-  
-  
+
+
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
 
@@ -983,6 +1018,9 @@ async def onMessage(client, message):
 
 scheduler = AsyncIOScheduler()
 scheduler.add_job(server_status, "interval", seconds=3)
+scheduler.add_job(day_greet_message, "cron", hour=7, minute=0)
+scheduler.add_job(day_greet_message, "cron", hour=12, minute=0)
+scheduler.add_job(day_greet_message, "cron", hour=18, minute=0)
 
 scheduler.start()
 app.run()  # Automatically start() and idle()
