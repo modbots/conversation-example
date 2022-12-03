@@ -1,3 +1,4 @@
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyrogram import Client, filters, enums
 import os
 import asyncio
