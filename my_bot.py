@@ -17,7 +17,7 @@ import pandas as pd
 from random import choice as rand_choice
 import requests
 import datetime
-
+import pytz
 
 def random_with_N_digits(n):
     range_start = 10**(n-1)
@@ -104,7 +104,7 @@ async def day_greet_message():
         [
             "Very Good Morning කොල්ලො කෙල්ලො ටික ! අද මොනාද කරන්න තියෙන්නේ ?"
             "ගුම් මෝනිං කට්ටිය ! අද වැඩ ටික හොඳට කරගන්න !"
-            "Very Very Good Morning කස්ටිය ! අද හොද දවසක් වෙයි නේ ?"
+            "Very Very Good Morning කස්ටිය ! "
         ],
         [
             "Good Afternoon! අද අව්ව සැරයිද ?",
@@ -112,13 +112,14 @@ async def day_greet_message():
             "දැන් දවල් 12හයි නේ, හවස් වෙන්න කලින් අද වැඩ ටික ඉවරකර ගමු !"
         ],
         [
-            "හම්මාහ්,මහන්සියි නං පොඩි ආතල් එකක් ගමු නේ !",
+            # "හම්මාහ්,මහන්සියි නං පොඩි ආතල් එකක් ගමු නේ !",
             "Good Evening කස්ටිය,හවසුත් උනානේ!",
             "හවස් උනානේ,අද වැඩ ටික ඉවරකරා නේ? නැත්තම් ඉක්මන්ට කරමු..."
         ]
     ]
     # get date in gmt 5:30
-    date = datetime.now(timezone('Asia/Colombo'))
+    date=datetime.datetime.now(pytz.timezone("Asia/Colombo"))
+
     hour = date.hour
     if hour == 7:
         greet = rand_choice(day_greet[0])
@@ -1017,7 +1018,7 @@ async def onMessage(client, message):
 
 scheduler = AsyncIOScheduler(timezone="Asia/Colombo")
 scheduler.add_job(server_status, "interval", seconds=3)
-scheduler.add_job(day_greet_message, "cron", hour=7, minute=0)
+scheduler.add_job(day_greet_message, "cron", hour=8, minute=0)
 scheduler.add_job(day_greet_message, "cron", hour=12, minute=0)
 scheduler.add_job(day_greet_message, "cron", hour=18, minute=0)
 
