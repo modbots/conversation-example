@@ -1,4 +1,3 @@
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pyrogram import Client, filters, enums
 import os
 import asyncio
@@ -103,9 +102,9 @@ async def server_status():
 async def day_greet_message():
     day_greet = [
         [
-            "Very Good Morning කොල්ලො කෙල්ලො ටික ! අද මොනාද කරන්න තියෙන්නේ ?"
-            "ගුම් මෝනිං කට්ටිය ! අද වැඩ ටික හොඳට කරගන්න !"
-            "Very Very Good Morning කස්ටිය ! "
+            "Very Good Morning කොල්ලො කෙල්ලො ටික ! අද මොනාද කරන්න තියෙන්නේ ?",
+            "ගුම් මෝනිං කට්ටිය ! අද වැඩ ටික හොඳට කරගන්න !",
+            "Very Very Good Morning කස්ටිය ! ",
         ],
         [
             "Good Afternoon! අද අව්ව සැරයිද ?",
@@ -115,7 +114,7 @@ async def day_greet_message():
         [
             # "හම්මාහ්,මහන්සියි නං පොඩි ආතල් එකක් ගමු නේ !",
             "Good Evening කස්ටිය,හවසුත් උනානේ!",
-            "හවස් උනානේ,අද වැඩ ටික ඉවරකරා නේ? නැත්තම් ඉක්මන්ට කරමු..."
+            "හවස් උනානේ,අද වැඩ ටික ඉවරකරා නේ? නැත්තම් ඉක්මන්ට කරමු...",
         ]
     ]
     # get date in gmt 5:30
