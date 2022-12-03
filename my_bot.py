@@ -19,6 +19,7 @@ import requests
 import datetime
 import pytz
 
+
 def random_with_N_digits(n):
     range_start = 10**(n-1)
     range_end = (10**n)-1
@@ -118,14 +119,14 @@ async def day_greet_message():
         ]
     ]
     # get date in gmt 5:30
-    date=datetime.datetime.now(pytz.timezone("Asia/Colombo"))
+    date = datetime.datetime.now(pytz.timezone("Asia/Colombo"))
 
     hour = date.hour
-    if hour == 7:
+    if hour < 12:
         greet = rand_choice(day_greet[0])
-    if hour == 12:
+    if hour >= 12 and hour < 18:
         greet = rand_choice(day_greet[1])
-    if hour == 18:
+    if hour >= 18:
         greet = rand_choice(day_greet[2])
 
     # send the message to admin chats if its a group
