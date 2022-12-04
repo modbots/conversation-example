@@ -165,7 +165,12 @@ def get_replacements():
     # send as dict
     replacements = {}
     for row in rows:
-        replacements[row[0]] = row[1]
+        #if row[0] only a emoji 
+        if len(row[0].strip()) == 1:
+            replacements[row[0]] = row[1]
+        else:
+            replacements['(?<![A-z]|#)'+row[0].strip()+'(?![A-z])'] = row[1]
+
     cur.close()
     return replacements
 
