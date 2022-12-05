@@ -169,7 +169,7 @@ def get_replacements():
         if len(row[0].strip()) == 1:
             replacements[row[0]] = row[1]
         else:
-            replacements['(?<![A-z]|#)'+row[0].strip()+'(?![A-z])'] = row[1]
+            replacements['(?<![A-z]|#|-|=|_)'+row[0].strip()+'(?![A-z])'] = row[1]
 
     cur.close()
     return replacements
