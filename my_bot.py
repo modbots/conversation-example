@@ -15,6 +15,7 @@ from convopyro import Conversation
 from convopyro import listen_message
 import pandas as pd
 from random import choice as rand_choice
+from ask import ask
 import requests
 import datetime
 import pytz
@@ -744,6 +745,11 @@ async def botrst(client, message):
 async def onMessage(client, message):
 
     channel_id = str(message.chat.id)
+    caption = message.caption or message.text
+    if chat_id in admin_chat_ids:
+        if caption.startswith("Nangi") or caption.startswith("nangi"):
+            #reply
+            await message.reply_text(ask(caption))
     # import pickle
 
     # pickle.dump(message, open("message.pickle", "wb"))
