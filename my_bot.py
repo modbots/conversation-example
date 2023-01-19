@@ -743,7 +743,7 @@ async def botrst(client, message):
 
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
-
+    chat_id = message.chat.id
     channel_id = str(message.chat.id)
     caption = message.caption or message.text
     if chat_id in admin_chat_ids:
