@@ -752,7 +752,7 @@ async def onMessage(client, message):
     if chat_id in admin_chat_ids and (caption.startswith("Nangi") or caption.startswith("nangi")):
 
         if last_wait !=None:
-            if last_wait+30 > time.time():
+            if last_wait+30 < time.time():
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
                 return
         try:
