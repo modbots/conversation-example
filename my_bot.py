@@ -750,7 +750,6 @@ async def onMessage(client, message):
     caption = message.caption or message.text
     global last_wait
     if chat_id in admin_chat_ids and (caption.startswith("Nangi") or caption.startswith("nangi")):
-
         if last_wait !=None:
             if last_wait+30 > time.time():
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
@@ -760,7 +759,7 @@ async def onMessage(client, message):
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
-            
+                        
 
 
     # import pickle
