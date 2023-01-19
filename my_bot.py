@@ -753,13 +753,13 @@ async def onMessage(client, message):
 
         if last_wait !=None:
             if last_wait+30 > time.time():
-                await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
+                await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
                 return
         try:
             await message.reply_text(ask(caption))
         except:
             last_wait=time.time()
-            await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
+            await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
             
 
 
