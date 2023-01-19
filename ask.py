@@ -18,7 +18,7 @@ def ask(text):
     return response.choices[0].text
 
 if __name__== '__main__':
-    print(ask('nangi what is your jio ?'))
+    print(ask('nangi what is your iop ?'))
 
 
 
