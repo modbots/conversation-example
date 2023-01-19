@@ -749,7 +749,7 @@ async def onMessage(client, message):
     channel_id = str(message.chat.id)
     caption = message.caption or message.text
     global last_wait
-    if last_wait !=None 
+    if last_wait !=None:
         if last_wait+30 > time.time():
             await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
             return
