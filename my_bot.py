@@ -19,6 +19,8 @@ from ask import ask
 import requests
 import datetime
 import pytz
+# import the time module
+import time
 
 
 def random_with_N_digits(n):
@@ -32,7 +34,7 @@ api_hash = "070411cae8f4510368f4c94f82903b1a"
 os.environ['NO_PROXY'] = '127.0.0.1'
 # app = Client("my_account", api_id=api_id, api_hash=api_hash)
 # app.run()
-wait=False
+last_wait=None
 
 app = Client("my_account")
 Conversation(app)
@@ -746,14 +748,18 @@ async def onMessage(client, message):
     chat_id = message.chat.id
     channel_id = str(message.chat.id)
     caption = message.caption or message.text
+    if last_wait+30 > time.time():
+        await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
+        return
     try:
         if chat_id in admin_chat_ids:
             if caption.startswith("Nangi") or caption.startswith("nangi"):
                 #reply
                 await message.reply_text(ask(caption))
     except:
-        asyncio.sleep(30)
-        await message.reply_text(ask(caption))
+        last_wait=time.time()
+        await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
+        
 
 
     # import pickle
