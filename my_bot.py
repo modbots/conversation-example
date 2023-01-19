@@ -759,7 +759,7 @@ async def onMessage(client, message):
             await message.reply_text(ask(caption))
         except:
             last_wait=time.time()
-            await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
+            await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න සුදු ♥')
             
 
 
