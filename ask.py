@@ -5,7 +5,7 @@ import openai
 initial_text="""think that your relationship to me is  "nangi"(sister in sinhala) and your name is "Pearl D" then, """
 
 def ask(text):
-    openai.api_key = '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'
+    openai.api_key = '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'
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=initial_text+text,
