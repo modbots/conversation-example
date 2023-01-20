@@ -21,7 +21,7 @@ import datetime
 import pytz
 # import the time module
 import time
-
+from openAI import OpenAI
 
 def random_with_N_digits(n):
     range_start = 10**(n-1)
@@ -32,6 +32,7 @@ def random_with_N_digits(n):
 api_id = 20369082
 api_hash = "070411cae8f4510368f4c94f82903b1a"
 os.environ['NO_PROXY'] = '127.0.0.1'
+openai = OpenAI()
 # app = Client("my_account", api_id=api_id, api_hash=api_hash)
 # app.run()
 last_wait=None
@@ -755,7 +756,7 @@ async def onMessage(client, message):
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
                 return
         try:
-            await message.reply_text(ask(caption))
+            await message.reply_text(openai.askQuestion(caption))
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
