@@ -757,7 +757,7 @@ async def onMessage(client, message):
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
                 return
         
-        if "image" in message or "art" in message or "photo" in message:
+        if "image" in caption or "art" in caption or "photo" in caption:
             caption = caption.replace("nangi", "").replace("Nangi", "")
             await message.reply_photo(openi.generateImage(question=caption))
             return
