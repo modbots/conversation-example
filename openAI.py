@@ -4,6 +4,8 @@ import openai
 import os
 from time import sleep
 import dotenv
+import urllib.parse
+
 
 dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
@@ -74,8 +76,8 @@ class OpenAi:
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=self.prefix+question,
-                temperature=0,
-                max_tokens=60,
+                temperature=0.9,
+                max_tokens=1000,
                 top_p=1.0,
                 frequency_penalty=0.0,
                 presence_penalty=0.0
@@ -98,7 +100,7 @@ class OpenAi:
     def generateImage(self, question,):
         try:
             openai.api_key = self.api_key
-            response=openai.Image.create(
+            response = openai.Image.create(
                 prompt=question,
                 n=2,
                 size="1024x1024"
@@ -109,7 +111,15 @@ class OpenAi:
             self.updateKey()
             return self.generateImage(question)
 
+    def deleteFile(self, url):
+        # get file name from above url
+        parsed_url = urllib.parse.urlparse(url)
+        file = "img-"+parsed_url.path.split("/")[-1].split(".")[0].split("-")[-1]
+        print(file)
+        openai.api_key = self.api_key
+        response=openai.File.delete(file)
+        return response           
 
 if __name__ == "__main__":
     openi = OpenAi()
-    print(openi.generateImage(question="A man with a car") )
+    print(openi.askQuestion("what do you know about madol duwa?"))
