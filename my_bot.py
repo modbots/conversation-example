@@ -21,7 +21,7 @@ import datetime
 import pytz
 # import the time module
 import time
-from openAI import OpenAi()
+from openAI import OpenAi
 
 def random_with_N_digits(n):
     range_start = 10**(n-1)
