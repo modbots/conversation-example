@@ -5,7 +5,7 @@ initial_text="""think that your relationship to me is  "nangi"(sister in sinhala
 
 def ask(text):
     import openai
-    openai.api_key = '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'
+    openai.api_key = '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'
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=initial_text+text,
@@ -18,7 +18,7 @@ def ask(text):
     return response.choices[0].text
 
 if __name__== '__main__':
-    print(ask('nangi what is your iop ?'))
+    print(ask('nangi what is whats ur age ?'))
 
 
 
