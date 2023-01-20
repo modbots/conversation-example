@@ -3,8 +3,9 @@ import requests
 import openai
 from time import sleep
 
+
 class OpenAi:
-    def __init__(self,prefix='Im goa'):
+    def __init__(self, prefix='Im goa'):
 
         self.api_key = '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'
         self.headers = {
@@ -24,7 +25,8 @@ class OpenAi:
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.55'
         }
         self.url = "https://api.openai.com/dashboard/user/api_keys"
-        self.api_key = self.updateKey()
+        self.api_key = None
+        self.updateKey()
         self.prefix = prefix
 
     def getKeys(self):
@@ -63,7 +65,7 @@ class OpenAi:
         for key in keys:
             self.deleteKey(key['sensitive_id'], key['created'])
 
-        return self.generateKey()
+        self.api_key = self.generateKey()
 
     def askQuestion(self, question):
         try:
