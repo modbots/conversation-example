@@ -21,7 +21,7 @@ import datetime
 import pytz
 # import the time module
 import time
-from openAI import OpenAI
+from openAI import OpenAi()
 
 def random_with_N_digits(n):
     range_start = 10**(n-1)
@@ -32,7 +32,7 @@ def random_with_N_digits(n):
 api_id = 20369082
 api_hash = "070411cae8f4510368f4c94f82903b1a"
 os.environ['NO_PROXY'] = '127.0.0.1'
-openai = OpenAI()
+openai = OpenAi()
 # app = Client("my_account", api_id=api_id, api_hash=api_hash)
 # app.run()
 last_wait=None
