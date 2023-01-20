@@ -89,14 +89,27 @@ class OpenAi:
                 return reply
             else:
                 return self.askQuestion(question+reply, reply)
-                  
 
         except:
             sleep(5)
             self.updateKey()
             return self.askQuestion(question, reply)
 
+    def generateImage(self, question,):
+        try:
+            openai.api_key = self.api_key
+            response=openai.Image.create(
+                prompt=question,
+                n=2,
+                size="1024x1024"
+            )
+            return response.data[0]
+        except:
+            sleep(5)
+            self.updateKey()
+            return self.generateImage(question)
+
 
 if __name__ == "__main__":
     openi = OpenAi()
-    print(openi.askQuestion('Send me a to send mail using node js?'))
+    print(openi.generateImage(question="A man with a car") )

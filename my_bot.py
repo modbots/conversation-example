@@ -756,7 +756,13 @@ async def onMessage(client, message):
             if last_wait+30 > time.time():
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
                 return
+        
+        if "image" in message or "art" in message or "photo" in message:
+            caption = caption.replace("nangi", "").replace("Nangi", "")
+            await message.reply_photo(openi.generateImage(question=caption))
+            return
         try:
+            
             await message.reply_text(openai.askQuestion(caption))
         except:
             last_wait=time.time()
