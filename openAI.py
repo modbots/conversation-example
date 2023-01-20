@@ -79,7 +79,12 @@ class OpenAi:
                 frequency_penalty=0.0,
                 presence_penalty=0.0
             )
-            return response.choices[0].text
+            choice = response.choices[0]
+            finish_reason=choice.finish_reason
+            if finish_reason == 'stop':
+                return choice.text
+            else:
+                return self.askQuestion(question+choice.text)
         except:
             sleep(5)
             self.updateKey()
@@ -88,4 +93,4 @@ class OpenAi:
 
 if __name__ == "__main__":
     openi = OpenAi()
-    print(openi.askQuestion('i need you'))
+    print(openi.askQuestion('nangi  what do you know about  madol duwa?'))
