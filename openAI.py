@@ -1,11 +1,16 @@
 import json
 import requests
 import openai
+import os
 from time import sleep
+import dotenv
+
+dotenv_file = dotenv.find_dotenv()
+dotenv.load_dotenv(dotenv_file)
 
 
 class OpenAi:
-    def __init__(self, prefix='Im goa'):
+    def __init__(self, prefix=''):
 
         self.api_key = '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'
         self.headers = {
@@ -25,8 +30,7 @@ class OpenAi:
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36 Edg/109.0.1518.55'
         }
         self.url = "https://api.openai.com/dashboard/user/api_keys"
-        self.api_key = None
-        self.updateKey()
+        self.api_key = os.environ["OPENAI_API_KEY"]
         self.prefix = prefix
 
     def getKeys(self):
@@ -35,14 +39,11 @@ class OpenAi:
         return json.loads(response.text)['data']
 
     def generateKey(self):
-
         payload = json.dumps({
             "action": "create"
         })
-
         response = requests.request(
             "POST", self.url, headers=self.headers, data=payload)
-
         return json.loads(response.text)['key']['sensitive_id']
 
     def deleteKey(self, sensitive_id, created_at):
@@ -51,10 +52,8 @@ class OpenAi:
             "created_at": created_at,
             "redacted_key": sensitive_id,
         })
-
         response = requests.request(
             "POST", self.url, headers=self.headers, data=payload)
-        print(response.text)
 
     def updateKey(self):
         keys = self.getKeys()
@@ -66,8 +65,10 @@ class OpenAi:
             self.deleteKey(key['sensitive_id'], key['created'])
 
         self.api_key = self.generateKey()
+        dotenv.set_key(dotenv_file, "OPENAI_API_KEY", self.api_key)
 
-    def askQuestion(self, question):
+    def askQuestion(self, question, reply='', count=0):
+        count += 1
         try:
             openai.api_key = self.api_key
             response = openai.Completion.create(
@@ -80,17 +81,22 @@ class OpenAi:
                 presence_penalty=0.0
             )
             choice = response.choices[0]
-            finish_reason=choice.finish_reason
+            finish_reason = choice.finish_reason
+            reply += choice.text
+            if count > 10:
+                return reply
             if finish_reason == 'stop':
-                return choice.text
+                return reply
             else:
-                return self.askQuestion(question+choice.text)
+                return self.askQuestion(question+reply, reply)
+                  
+
         except:
             sleep(5)
             self.updateKey()
-            return self.askQuestion(question)
+            return self.askQuestion(question, reply)
 
 
 if __name__ == "__main__":
     openi = OpenAi()
-    print(openi.askQuestion('nangi  what do you know about  madol duwa?'))
+    print(openi.askQuestion('Send me a to send mail using node js?'))
