@@ -103,7 +103,7 @@ class OpenAi:
                 n=2,
                 size="1024x1024"
             )
-            return response.data[0]
+            return response.data[0].url
         except:
             sleep(5)
             self.updateKey()
