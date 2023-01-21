@@ -759,7 +759,7 @@ async def onMessage(client, message):
         
         if "image" in caption or "art" in caption or "photo" in caption:
             caption = caption.replace("nangi", "").replace("Nangi", "")
-            await message.reply_photo(openai.generateImage(question=caption))
+            await message.reply_photo(openai.generateImage(question='\n'+caption))
             return
         try:
             
