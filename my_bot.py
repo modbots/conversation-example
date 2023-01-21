@@ -757,9 +757,9 @@ async def onMessage(client, message):
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
                 return
         
+        caption = caption.replace("nangi", "").replace("Nangi", "")
         if "image" in caption or "art" in caption or "photo" in caption or "draw" in caption or "drawing" in caption or "picture" in caption or "pic" in caption or "paint" in caption or "painting" in caption:
             await client.send_chat_action(chat_id, enums.ChatAction.UPLOAD_PHOTO)
-            caption = caption.replace("nangi", "").replace("Nangi", "")
             await message.reply_photo(openai.generateImage(question=caption))
             return
         try:
