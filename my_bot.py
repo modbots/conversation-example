@@ -759,11 +759,11 @@ async def onMessage(client, message):
         
         if "image" in caption or "art" in caption or "photo" in caption:
             caption = caption.replace("nangi", "").replace("Nangi", "")
-            await message.reply_photo(openai.generateImage(question='\n'+caption))
+            await message.reply_photo(openai.generateImage(question=caption))
             return
         try:
             
-            await message.reply_text(openai.askQuestion(caption))
+            await message.reply_text(openai.askQuestion('\nQuestion:'+caption+'Answer:\n'))
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
