@@ -15,7 +15,6 @@ from convopyro import Conversation
 from convopyro import listen_message
 import pandas as pd
 from random import choice as rand_choice
-from ask import ask
 import requests
 import datetime
 import pytz
