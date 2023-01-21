@@ -747,6 +747,7 @@ async def botrst(client, message):
 @app.on_message(filters.incoming & ~filters.forwarded & ~filters.poll)
 async def onMessage(client, message):
     chat_id = message.chat.id
+    username = message.from_user.first_name
     channel_id = str(message.chat.id)
     caption = message.caption or message.text
     global last_wait
@@ -764,7 +765,7 @@ async def onMessage(client, message):
         try:
             
             await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-            await message.reply_text(openai.askQuestion('\nQuestion:'+caption+'Answer:\n'))
+            await message.reply_text(openai.askQuestion('\nQuestion:'+caption+'\nAnswer to '+username+':'))
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
