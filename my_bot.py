@@ -765,7 +765,7 @@ async def onMessage(client, message):
         try:
             
             await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-            await message.reply_text(openai.askQuestion('\nQuestion:'+caption+'\nAnswer to '+username+':'))
+            await message.reply_text(openai.askQuestion('\nQuestion from Pear D:'+caption+'\nAnswer to '+username+':'))
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
