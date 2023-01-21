@@ -31,7 +31,7 @@ def random_with_N_digits(n):
 api_id = 20369082
 api_hash = "070411cae8f4510368f4c94f82903b1a"
 os.environ['NO_PROXY'] = '127.0.0.1'
-initial_text="""my relationship to you is  "nangi"(sister in sinhala) and my name is "Pearl D" then,\n"""
+initial_text="""your relationship to me is  "nangi"(sister in sinhala) and your name is "Pearl D" then,\n"""
 openai = OpenAi(prefix=initial_text)
 # app = Client("my_account", api_id=api_id, api_hash=api_hash)
 # app.run()
@@ -765,7 +765,7 @@ async def onMessage(client, message):
         try:
             
             await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-            await message.reply_text(openai.askQuestion('\nQuestion from '+username+'(nangi):'+caption+'\nAnswer to '+username+' from Pearl D:'))
+            await message.reply_text(openai.askQuestion('\nQuestion from '+username+':'+caption+'\nAnswer to '+username+' from Pearl D:'))
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
