@@ -751,18 +751,19 @@ async def onMessage(client, message):
     caption = message.caption or message.text
     global last_wait
     if chat_id in admin_chat_ids and (caption.startswith("Nangi") or caption.startswith("nangi")):
-        await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
         if last_wait !=None:
             if last_wait+30 > time.time():
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
                 return
         
-        if "image" in caption or "art" in caption or "photo" in caption:
+        if "image" in caption or "art" in caption or "photo" in caption or "draw" in caption or "drawing" in caption or "picture" in caption or "pic" in caption or "paint" in caption or "painting" in caption:
+            await client.send_chat_action(chat_id, enums.ChatAction.UPLOAD_PHOTO)
             caption = caption.replace("nangi", "").replace("Nangi", "")
             await message.reply_photo(openai.generateImage(question=caption))
             return
         try:
             
+            await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
             await message.reply_text(openai.askQuestion('\nQuestion:'+caption+'Answer:\n'))
         except:
             last_wait=time.time()
