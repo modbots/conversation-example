@@ -767,7 +767,7 @@ async def onMessage(client, message):
             #get time now in colombo
             now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).strftime('%Y-%m-%d %H:%M:%S') + " Colombo Sri Lanka (GMT +5:30)"
             await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-            await message.reply_text(openai.askQuestion('Current Date, Time is :'+now+' \n use correct geeting according to time\nQuestion from '+username+':'+caption+'\nAnswer to '+username+' from Pearl D:'))
+            await message.reply_text(openai.askQuestion('Current Date, Time is :'+now+' \n use correct greeting according to time if greeeted\nQuestion from '+username+':'+caption+'\nAnswer to '+username+' from Pearl D(nangi):'))
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
