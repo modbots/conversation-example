@@ -752,7 +752,7 @@ async def onMessage(client, message):
     caption = message.caption or message.text
     global last_wait
     #is private chat
-    is_private=message.chat.type == pyrogram.enums.ChatType.PRIVATE
+    is_private=message.chat.type == enums.ChatType.PRIVATE
     if is_private or (chat_id in admin_chat_ids and (caption.startswith("Nangi") or caption.startswith("nangi"))):
         if not is_private:
              caption = re.sub(r'^\w+\s*', '', caption)
