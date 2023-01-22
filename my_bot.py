@@ -31,7 +31,7 @@ def random_with_N_digits(n):
 api_id = 20369082
 api_hash = "070411cae8f4510368f4c94f82903b1a"
 os.environ['NO_PROXY'] = '127.0.0.1'
-initial_text="""your relationship to me is  "nangi"(sister in sinhala) and your name is "Pearl D" then,\n"""
+initial_text="""your relationship to me is  "nangi"(sister in sinhala) and your name is "Pearl D";your crush is naveen Ayya(brother) then,\n"""
 openai = OpenAi(prefix=initial_text)
 # app = Client("my_account", api_id=api_id, api_hash=api_hash)
 # app.run()
