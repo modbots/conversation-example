@@ -751,14 +751,17 @@ async def onMessage(client, message):
     channel_id = str(message.chat.id)
     caption = message.caption or message.text
     global last_wait
-    if chat_id in admin_chat_ids and (caption.startswith("Nangi") or caption.startswith("nangi")):
+    #is private chat
+    is_private=message.chat.type == pyrogram.enums.ChatType.PRIVATE
+    if is_private or (chat_id in admin_chat_ids and (caption.startswith("Nangi") or caption.startswith("nangi"))):
+        if not is_private:
+             caption = re.sub(r'^\w+\s*', '', caption)
         if last_wait !=None:
             if last_wait+30 > time.time():
                 await message.reply_text('මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
                 return
         
         #replace the first word
-        caption = re.sub(r'^\w+\s*', '', caption)
         if "image" in caption or "art" in caption or "photo" in caption or "draw" in caption or "drawing" in caption or "picture" in caption or "pic" in caption or "paint" in caption or "painting" in caption:
             await client.send_chat_action(chat_id, enums.ChatAction.UPLOAD_PHOTO)
             await message.reply_photo(openai.generateImage(question=caption))
