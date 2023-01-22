@@ -764,9 +764,10 @@ async def onMessage(client, message):
             await message.reply_photo(openai.generateImage(question=caption))
             return
         try:
-            
+            #get time now in colombo
+            now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30))).strftime('%Y-%m-%d %H:%M:%S') + " Colombo Sri Lanka"
             await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-            await message.reply_text(openai.askQuestion('\nQuestion from '+username+':'+caption+'\nAnswer to '+username+' from Pearl D:'))
+            await message.reply_text(openai.askQuestion('Time is :'+now+'\nQuestion from '+username+':'+caption+'\nAnswer to '+username+' from Pearl D:'))
         except:
             last_wait=time.time()
             await message.reply_text('ඔහ්! මට චුට්ටක් ඔලුව රිදෙනවා වගේ තවටිකකින් අහන්න ♥')
